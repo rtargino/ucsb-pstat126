@@ -1,0 +1,176 @@
+---
+output: 
+  pdf_document:
+      template: template.tex
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+\begin{center}
+{\Large \textsc{PSTAT 126: Regression Analysis}}
+\end{center}
+\begin{center}
+Winter 2023
+\end{center}
+
+\begin{center}
+\rule{6in}{0.4pt}
+\begin{minipage}[t]{.75\textwidth}
+\begin{tabular}{llcccll}
+\textbf{Instructor:} & Rodrigo Targino & \\
+\textbf{Office:} & Old Gym 1203 & \\
+\textbf{Email:} &
+                  \href{mailto:rodrigotargino@ucsb.edu}{rodrigotargino@ucsb.edu}
+                                        & & & &  & 
+\end{tabular}
+\end{minipage}
+\rule{6in}{0.4pt}
+\end{center}
+\vspace{.5cm}
+\setlength{\unitlength}{1in}
+\renewcommand{\arraystretch}{2}
+
+
+\noindent\textbf{Course Pages:}
+\begin{itemize}
+\item Location: \href{https://goo.gl/maps/e1tvM7MZmZ1kFVX68}{PSYCH 1924}
+\item Gauchospace: \href{https://gauchospace.ucsb.edu/courses/course/view.php?id=33131}{link}
+\item Nectir: \href{https://app.nectir.io/invite/frdqQD}{link}. We ask that when you have a question about the class that might be relevant to other students, post it on Nectir instead of emailing us. That way, all the staff can be on the same page and everyone can benefit from the response.
+\item JupyterHub: \href{https://pstat126.lsit.ucsb.edu/}{link}. All your work may be completed here.
+\item GradeScope: \href{https://www.gradescope.com}{link}. Bi-weekly homework assignments are a required part of the course.
+\item Use this \href{https://pstat126.lsit.ucsb.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Frtargino%2Fucsb-pstat126&urlpath=rstudio%2F&branch=main}{link} to sync new assignments and labs.
+\begin{itemize}
+\item {\color{red} Bookmark this link, you will use it a lot!}
+\end{itemize}
+
+\end{itemize}
+
+
+
+\vskip.15in
+\noindent\textbf{Office Hours:}
+
+\noindent Professor Targino \url{rodrigotargino@ucsb.edu}: Office Hours, TBA at OG1203 and on Zoom \url{TBA} 
+
+\noindent TBA [TA] \url{xxx@ucsb.edu}: Office Hours, TBA
+
+\vskip.15in
+\noindent\textbf{Course Texts} 
+
+\begin{itemize}
+\item \textbf{Required:} Faraway, J. J. (2005) \textit{Linear Models with R}
+\item \textbf{R programming:} Grolemund and Wickham \textit{R for Data Science}, \url{https://r4ds.had.co.nz/index.html}
+\item Optional: Weisberg, S. (2005) {\textit{Applied Linear Regression,} 3rd edition}
+\end{itemize} 
+
+\vskip.15in
+\noindent\textbf{Objectives:} 
+
+\vspace{1em}
+This course introduces the theory and application of linear regression models and uses R to solve real-world problems
+
+\vskip.15in
+\noindent\textbf{Prerequisites:}
+
+\vspace{1em}
+PSTAT 10 and PSTAT 120B both with a minimum grade of C or better. Familiarity with R is required.
+
+\vspace*{.15in}
+
+\noindent \textbf{Tentative Course Topics:}
+\begin{center}
+\begin{minipage}{5in}
+\begin{flushleft}
+{\color{darkgreen}{\Rectangle}} ~ simple and multiple regression models\\
+{\color{darkgreen}{\Rectangle}} ~ estimation\\
+{\color{darkgreen}{\Rectangle}} ~ inference\\
+{\color{darkgreen}{\Rectangle}} ~ prediction\\
+{\color{darkgreen}{\Rectangle}} ~ regression diagnostics\\
+{\color{darkgreen}{\Rectangle}} ~ model selection\\
+{\color{darkgreen}{\Rectangle}} ~ shrinkage methods \\
+{\color{darkgreen}{\Rectangle}} ~ analysis of variance \\
+\end{flushleft}
+\end{minipage}
+\end{center}
+
+<!-- \pagebreak -->
+
+\vspace*{.15in}
+\noindent\textbf{Grading Policy:}
+\begin{itemize}
+\item Homework (40\%).
+  \begin{itemize}
+    \item There will be approximately 4 homeworks, with roughly two weeks to complete
+    \item Homework solutions must be done in RMarkdown and turned in on Gradescope.  Each homework assignment will be given as a template that you should work from.
+    \item All code must be written to be reproducible in Rmarkdown
+    \item All derivations can be done in any format of your choosing (latex, written by hand) but must be legible and \emph{must be incorporated into your final pdf}.
+    \item All files must be zipped together and submitted to Gradescope
+    \item Ask a TA \emph{early} if you have problems regarding submissions. 
+    \item Homework not submitted online before the deadline will
+  be considered late ($20\%$ of the grade deducted). 24 hours after the deadline
+  homework will not be accepted and no credit will be awarded. Do not
+  wait until the night before it is due to start working!
+  \end{itemize}
+
+\item Quizzes (20\%)
+  \begin{itemize}
+    \item Roughly every week
+    \item Online, on gradescope
+  \end{itemize}
+\item Final exam (40\%)
+\end{itemize}
+
+\noindent{\textbf{Homeworks:}}
+
+\begin{itemize}
+\item  All files will be submitted electronically via Gradescope
+\item  Submit a zip file containing:
+  \begin{enumerate}
+    \item R markdown code (.Rmd file, template provided)\\
+    \item Any additional files as needed\\
+    \item Generated PDF file
+  \end{enumerate}
+\end{itemize}
+\vskip.15in
+\newpage
+<!-- \noindent\textbf{Important Dates:} -->
+<!-- \begin{center} \begin{minipage}{3.8in} -->
+<!--     \begin{flushleft} -->
+<!-- Midterm \dotfill ~ October 27, 2022 (take home)\\ -->
+<!-- Final Exam \dotfill ~ December 8, 2022 (take home)\\ -->
+<!-- \end{flushleft} -->
+<!-- \end{minipage} -->
+<!-- \end{center} -->
+
+\vskip.15in
+\noindent\textbf{Course Policies:}  
+
+\begin{itemize}
+\item Learning Cooperatively
+\begin{itemize}
+\item We encourage you to discuss all of the course activities with your friends and classmates as you are working on them. 
+\item You will definitely learn more in this class if you work with others than if you do not. Ask questions, answer questions, and share ideas liberally.
+\end{itemize}
+\item Academic Honesty
+\begin{itemize} 
+\item Cooperation has a limit. 
+\item You should not share your code or answers directly with other students. 
+\item Doing so doesn’t help them; it just sets them up for trouble on exams. 
+\item Feel free to discuss the problems with others beforehand, but not the solutions.
+\item Please complete your own work and keep it to yourself. 
+\item Penalties for cheating are severe — they range from a zero grade for the assignment up to dismissal from the University, for a second offense.
+\item Rather than copying someone else’s work, ask for help. You are not alone in this course! We are here to help you succeed. If you invest the time to learn the material and complete the projects, you won’t need to copy any answers.
+\end{itemize}
+\item Copyright of Course Materials
+\begin{itemize}
+\item The lectures and course materials, including PowerPoint presentations, tests, outlines, and similar materials, are protected by U.S. copyright law and by University policy. 
+\item I am the exclusive owner of the copyright in those materials I create. You may take notes and make copies of course materials for your own use. 
+\item You may also share those materials with another student who is enrolled in or auditing this course.
+\item You may not reproduce, distribute or display (post/upload) lecture notes or recordings or course materials in any other way — whether or not a fee is charged — without my express prior written consent. You also may not allow others to do so.
+\item If you do so, you may be subject to student conduct proceedings under the UC Santa Barbara Student Code of Conduct.
+\item Similarly, you own the copyright in your original papers and exam essays. If I am interested in posting your answers or papers on the course web site, I will ask for your written permission.
+
+\end{itemize}
+\end{itemize}
