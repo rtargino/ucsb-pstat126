@@ -1,0 +1,207 @@
+\documentclass[10pt]{beamer}
+\usepackage[utf8]{inputenc}
+
+\usepackage{multirow,rotating}
+\usepackage{color}
+%\usepackage{hyperref}
+\usepackage{tikz-cd}
+\usepackage{array}
+\usepackage{siunitx}
+\usepackage{mathtools,nccmath}%
+\usepackage{etoolbox, xparse} 
+
+\usetheme{CambridgeUS}
+\usecolortheme{dolphin}
+
+% set colors
+\definecolor{blue}{HTML}{005a8b}
+\definecolor{brightblue}{HTML}{a0cfeb}
+\definecolor{brighterblue}{HTML}{0157ad}
+\definecolor{darkblue}{HTML}{003c66}
+\definecolor{textcolor}{HTML}{000222}
+
+
+
+\definecolor{warmgrey}{HTML}{988f86} % {130,138,143}
+\setbeamercolor*{palette primary}{bg=darkblue}
+\setbeamercolor*{palette secondary}{bg=blue, fg = white}
+\setbeamercolor*{palette tertiary}{bg=warmgrey, fg = white}
+\setbeamercolor*{titlelike}{fg=blue}
+\setbeamercolor*{title}{bg=textcolor, fg = white}
+\setbeamercolor*{item}{fg=textcolor}
+\setbeamercolor*{caption name}{fg=warmgrey}
+\usefonttheme{professionalfonts}
+\usepackage{natbib}
+%\usepackage{hyperref}
+\usepackage[colorlinks=true,urlcolor=blue]{hyperref} 
+%------------------------------------------------------------
+% \titlegraphic{\includegraphics[height=0.75cm]{logo.png}} 
+
+% logo of my university
+
+
+
+
+\setbeamerfont{title}{size=\Huge}
+\setbeamerfont{subtitle}{size=\Large}
+\setbeamerfont{author}{size=\small}
+\setbeamerfont{date}{size=\large}
+\setbeamerfont{institute}{size=\footnotesize}
+\title[PSTAT 126: Regression Analysis]{PSTAT 126}%title
+\subtitle{Regression Analysis }%%subtitle
+\author[Laura Baracaldo \& Rodrigo Targino]{Laura Baracaldo \& Rodrigo Targino}%%authors
+
+\institute[UCSB]{}
+\date[\textcolor{white}{Lecure 0: Course Introduction}]
+{Lecture 0\\
+Course Introduction}
+
+%------------------------------------------------------------
+%This block of commands puts the table of contents at the 
+%beginning of each section and highlights the current section:
+%\AtBeginSection[]
+%{
+%  \begin{frame}
+%    \frametitle{Contents}
+%    \tableofcontents[currentsection]
+%  \end{frame}
+%}
+\AtBeginSection[]{
+  \begin{frame}
+  \vfill
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+    \usebeamerfont{title}\insertsectionhead\par%
+  \end{beamercolorbox}
+  \vfill
+  \end{frame}
+}
+% ------Contents below------
+%------------------------------------------------------------
+
+\begin{document}
+
+%The next statement creates the title page.
+\frame{\titlepage}
+
+
+
+% consider removing it if it's too redundant
+
+
+%------------------------------------------------------------
+
+\begin{frame}{Course Content}
+
+\begin{itemize}
+\large
+    \item This course introduces the theory and application of linear regression models. 
+    \item Topics: simple and multiple regression models; estimation; inference; prediction; regression diagnostics; model selection; shrinkage methods; analysis of variance. \item R: Solving real-world problems.
+\end{itemize}
+
+\end{frame}
+
+
+
+\begin{frame}{Class Format}
+\large
+{\bf Canvas}
+\begin{itemize}
+
+\item Lecture slides and labs will be available on {\em Canvas/Gauchospace} and also here:
+\url{shorturl.at/fgrt8}
+\item You will need to close and open again the link to fetch newly added content.
+\item Homework assignments and quizzes will also be given out on {\em Canvas/Gauchospace}, and should be turned in there. Other forms of submission will not be accepted.
+\item All Q\&A related to course content, homework assignments, R programming, and quizzes should
+be done on the nectir channel \url{https://app.nectir.io/invite/frdqQD}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{References}
+\large
+ The lecture slides are self-contained. You may find the following textbooks helpful:
+
+\begin{itemize}
+\item Faraway, J. J. (2005),\textit{ Linear Models with R}, Chapman \& Hall.
+\item Weisberg, S. (2005),\textit{ Applied Linear Regression}, 3rd edition, Wiley.
+\end{itemize}  
+
+\vspace{0.05in}
+
+{\bf R programming}
+\begin{itemize}
+\item \textit{R for Data Science} by Grolemund and Wickham.    \url{ https://r4ds.had.co.nz/index.html}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Grading}
+\large
+\begin{itemize}
+   \item {\bf 40 \%}. Homeworks. (Four hw assignments, due every two weeks.)
+   \item {\bf 20 \%}. Quizzes (On canvas)
+   \item {\bf 40 \%}. Final exam
+\end{itemize}
+    
+\end{frame}
+
+\begin{frame}{Homework}
+
+\begin{itemize}
+\large
+   \item R coding \& Math deriving/proof.
+   \item Typically you will have 2 weeks to complete the homework.
+   \item Late homework will receive 20\% point deduction.
+   \item Homework will not be accepted more than 24 hrs late.
+\end{itemize}
+    
+\end{frame}
+
+\begin{frame}{R, Rstudio \& Rmarkdown}
+
+\large
+\href{https://cloud.r-project.org}{\bf R}. User\-friendly programming language for statistical analysis.\\
+\href{http://www.rstudio.com/download}{\bf R studio}. Integrated development environment (IDE) for R.\\
+ {\bf R markdown (Rmd)}. Generates reproducible document with R.
+
+ \begin{itemize}
+     \item Syntax is very simple.
+     \item Integrated with LaTeX, easy to write math formulas.
+     \item Example: HomeworkTemplate.Rmd. (on \texttt{/homeworks/Template} on the server)
+ \end{itemize}
+ {\em Task: } Start setting up the R working environment (either in your own computer or in the server)!
+\end{frame}
+
+\begin{frame}{Homework submission Format}
+\large
+\begin{itemize}
+    \item Online submission via Canvas/Gauchospace
+    \item Submission must contain: R markdown code (.Rmd file), PDF generated, supplementary files if needed.
+    \item We should be able to run R markdown code to obtain identical PDF file.
+\end{itemize}
+
+
+    
+\end{frame}
+
+\begin{frame}{Next...}
+\large
+\begin{itemize}
+    \item Make sure you can knit HomeworkTemplate.Rmd.
+    \item Lab sessions start on the 2nd week.
+    \item Read from {\em R for Data Science}: Ch 1\&2 (very short), Ch 27 on (Rmd).
+\end{itemize}
+    
+\end{frame}
+
+\end{document}
+
+
+
+\begin{frame}
+
+\textcolor{textcolor}{\huge{\centerline{Thank you!}}}
+\vspace*{0.5cm}
+
+\textcolor{textcolor}{\Large{\centerline{E-mail: UMBID@umb.edu}}}
+
+\end{frame}

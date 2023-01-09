@@ -40,7 +40,7 @@ Winter 2023
 \item Nectir: \href{https://app.nectir.io/invite/frdqQD}{link}. We ask that when you have a question about the class that might be relevant to other students, post it on Nectir instead of emailing us. That way, all the staff can be on the same page and everyone can benefit from the response.
 \item JupyterHub: \href{https://pstat126.lsit.ucsb.edu/}{link}. All your work may be completed here.
 \item GradeScope: \href{https://www.gradescope.com}{link}. Bi-weekly homework assignments are a required part of the course.
-\item Use this \href{https://pstat126.lsit.ucsb.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Frtargino%2Fucsb-pstat126&urlpath=rstudio%2F&branch=main}{link} to sync new assignments and labs.
+\item Use this \href{shorturl.at/fgrt8}{link} to sync new assignments and labs.
 \begin{itemize}
 \item {\color{red} Bookmark this link, you will use it a lot!}
 \end{itemize}
