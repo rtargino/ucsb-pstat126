@@ -1,0 +1,63 @@
+<!DOCTYPE html><html><head><title>R: Taste of Cheddar cheese</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css">
+<script type="text/javascript">
+const macros = { "\\R": "\\textsf{R}", "\\code": "\\texttt"};
+function processMathHTML() {
+    var l = document.getElementsByClassName('reqn');
+    for (let e of l) { katex.render(e.textContent, e, { throwOnError: false, macros }); }
+    return;
+}</script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js"
+    onload="processMathHTML();"></script>
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body><div class="container">
+
+<table style="width: 100%;"><tr><td>cheddar</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Taste of Cheddar cheese</h2>
+
+<h3>Description</h3>
+
+<p>In a study of cheddar cheese from the LaTrobe Valley of Victoria, Australia,
+samples of cheese were analyzed for their chemical composition and were
+subjected to taste tests. Overall taste scores were obtained by combining
+the scores from several tasters.
+</p>
+
+
+<h3>Format</h3>
+
+<p>A data frame with 30 observations on the following 4 variables.
+</p>
+ <dl>
+<dt>taste</dt><dd><p>a subjective taste score</p>
+</dd>
+<dt>Acetic</dt><dd><p>concentration of acetic acid (log scale)</p>
+</dd>
+<dt>H2S</dt><dd><p>concentration of hydrogen sulfide (log scale)</p>
+</dd>
+<dt>Lactic</dt><dd><p>concentration of lactic acid</p>
+</dd> </dl>
+
+
+
+<h3>Source</h3>
+
+<p>David S. Moore and George P. McCabe (1993) Introduction to the Practice of Statistics,
+W. H. Freeman and company, second edition.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class='language-R'>
+data(cheddar)
+## maybe str(cheddar) ; plot(cheddar) ...
+
+</code></pre>
+
+
+</div>
+</body></html>

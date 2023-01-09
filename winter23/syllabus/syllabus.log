@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.12) (preloaded format=pdflatex 2023.1.8)  8 JAN 2023 19:00
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.12) (preloaded format=pdflatex 2023.1.8)  8 JAN 2023 20:02
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -473,7 +473,8 @@ tex.def
 File: l3backend-pdftex.def 2022-10-26 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count288
 \l__pdf_internal_box=\box54
-) (syllabus.aux)
+)
+No file syllabus.aux.
 \openout1 = `syllabus.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 87.
@@ -561,62 +562,24 @@ Package lastpage Info: Please have a look at the pageslts package at
 (lastpage)             https://www.ctan.org/pkg/pageslts
 (lastpage)             ! on input line 87.
 Package hyperref Info: Link coloring ON on input line 87.
-(syllabus.out) (syllabus.out)
 \@outlinefile=\write4
 \openout4 = `syllabus.out'.
 
-\c@lstlisting=\count295
-Package caption Info: Begin \AtBeginDocument code.
-Package caption Info: End \AtBeginDocument code.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 99.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 99.
-LaTeX Font Info:    Trying to load font information for U+ding on input line 16
-4.
-(C:\Users\targi\AppData\Local\Programs\MiKTeX\tex/latex/bbding\uding.fd
-File: Uding.fd 1996/02/01 v1.0 BBding font definitions
-) [1
-
-{C:/Users/targi/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}]
-Underfull \hbox (badness 10000) in paragraph at lines 209--210
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 210--211
-
- []
-
-[2] 
-AED: lastpage setting LastPage
-[3]
-
-Package caption Warning: Unused \captionsetup[lstlisting] on input line 29.
-See the caption package documentation for explanation.
-
-(syllabus.aux)
-Package rerunfilecheck Info: File `syllabus.out' has not changed.
-(rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
- ) 
+! I can't write on file `syllabus.pdf'.
+(Press Enter to retry, or Control-C to exit; default file extension is `.pdf')
+Please type another file name for output
+! Emergency stop.
+<to be read again> 
+                   \edef 
+l.87 \begin{document}
+                      
 Here is how much of TeX's memory you used:
- 13607 strings out of 476406
- 220561 string characters out of 2789568
- 1866787 words of memory out of 3000000
- 33805 multiletter control sequences out of 15000+600000
- 514020 words of font info for 38 fonts, out of 8000000 for 9000
+ 13387 strings out of 476406
+ 217900 string characters out of 2789568
+ 1848787 words of memory out of 3000000
+ 33611 multiletter control sequences out of 15000+600000
+ 512287 words of font info for 32 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 87i,11n,91p,328b,620s stack positions out of 10000i,1000n,20000p,200000b,80000s
- <C:\Users\targi\AppData\Local\MiKTeX\fonts/pk/ljfour/public/bbding/dpi600\bb
-ding10.pk> <C:\Users\targi\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi
-600\tcrm1000.pk><C:/Users/targi/AppData/Local/Programs/MiKTeX/fonts/type1/publi
-c/amsfonts/cm/cmbx10.pfb><C:/Users/targi/AppData/Local/Programs/MiKTeX/fonts/ty
-pe1/public/amsfonts/cm/cmcsc10.pfb><C:/Users/targi/AppData/Local/Programs/MiKTe
-X/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/targi/AppData/Local/Progra
-ms/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb>
-Output written on syllabus.pdf (3 pages, 84002 bytes).
-PDF statistics:
- 68 PDF objects out of 1000 (max. 8388607)
- 7 named destinations out of 1000 (max. 500000)
- 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 87i,0n,91p,289b,262s stack positions out of 10000i,1000n,20000p,200000b,80000s
 
+!  ==> Fatal error occurred, no output PDF file produced!

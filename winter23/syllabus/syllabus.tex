@@ -1,12 +1,90 @@
----
-output: 
-  pdf_document:
-      template: template.tex
----
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+\documentclass[]{article}
 
+\usepackage[inner=1.5cm,outer=1.5cm,top=2.5cm,bottom=2.5cm]{geometry}
+\pagestyle{empty}
+\usepackage{graphicx}
+\usepackage{fancyhdr, lastpage, bbding, pmboxdraw}
+\usepackage[usenames,dvipsnames]{color}
+\definecolor{darkblue}{rgb}{0,0,.6}
+\definecolor{darkred}{rgb}{.7,0,0}
+\definecolor{darkgreen}{rgb}{0,.6,0}
+\definecolor{red}{rgb}{.98,0,0}
+\usepackage[colorlinks,pagebackref,pdfusetitle,urlcolor=darkblue,citecolor=darkblue,linkcolor=darkred,bookmarksnumbered,plainpages=false]{hyperref}
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+
+\pagestyle{fancyplain}
+\fancyhf{}
+\lhead{ \fancyplain{}{Regression Analysis: PSTAT 126} }
+%\chead{ \fancyplain{}{} }
+\rhead{ \fancyplain{}{Fall 2019} }
+%\rfoot{\fancyplain{}{page \thepage\ of \pageref{LastPage}}}
+\fancyfoot[RO, LE] {page \thepage\ of \pageref{LastPage} }
+\thispagestyle{plain}
+
+%%%%%%%%%%%% LISTING %%%
+\usepackage{listings}
+\usepackage{caption}
+\DeclareCaptionFont{white}{\color{white}}
+\DeclareCaptionFormat{listing}{\colorbox{gray}{\parbox{\textwidth}{#1#2#3}}}
+\captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white}
+\usepackage{verbatim} % used to display code
+\usepackage{fancyvrb}
+\usepackage{acronym}
+\usepackage{amsthm}
+\VerbatimFootnotes % Required, otherwise verbatim does not work in footnotes!
+
+
+
+\definecolor{OliveGreen}{cmyk}{0.64,0,0.95,0.40}
+\definecolor{CadetBlue}{cmyk}{0.62,0.57,0.23,0}
+\definecolor{lightlightgray}{gray}{0.93}
+
+
+
+\lstset{
+%language=bash,                          % Code langugage
+basicstyle=\ttfamily,                   % Code font, Examples: \footnotesize, \ttfamily
+keywordstyle=\color{OliveGreen},        % Keywords font ('*' = uppercase)
+commentstyle=\color{gray},              % Comments font
+numbers=left,                           % Line nums position
+numberstyle=\tiny,                      % Line-numbers fonts
+stepnumber=1,                           % Step between two line-numbers
+numbersep=5pt,                          % How far are line-numbers from code
+backgroundcolor=\color{lightlightgray}, % Choose background color
+frame=none,                             % A frame around the code
+tabsize=2,                              % Default tab size
+captionpos=t,                           % Caption-position = bottom
+breaklines=true,                        % Automatic line breaking?
+breakatwhitespace=false,                % Automatic breaks only at whitespace?
+showspaces=false,                       % Dont make spaces visible
+showtabs=false,                         % Dont make tabls visible
+columns=flexible,                       % Column format
+morekeywords={__global__, __device__},  % CUDA specific keywords
+}
+
+
+
+
+
+
+\hypersetup{unicode=true,
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+
+\date{}
+
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+\begin{document}
 
 \begin{center}
 {\Large \textsc{PSTAT 126: Regression Analysis}}
@@ -32,54 +110,55 @@ Winter 2023
 \setlength{\unitlength}{1in}
 \renewcommand{\arraystretch}{2}
 
-
 \noindent\textbf{Course Pages:}
+
 \begin{itemize}
 \item Location: \href{https://goo.gl/maps/e1tvM7MZmZ1kFVX68}{PSYCH 1924}
 \item Gauchospace: \href{https://gauchospace.ucsb.edu/courses/course/view.php?id=33131}{link}
 \item Nectir: \href{https://app.nectir.io/invite/frdqQD}{link}. We ask that when you have a question about the class that might be relevant to other students, post it on Nectir instead of emailing us. That way, all the staff can be on the same page and everyone can benefit from the response.
 \item JupyterHub: \href{https://pstat126.lsit.ucsb.edu/}{link}. All your work may be completed here.
 \item GradeScope: \href{https://www.gradescope.com}{link}. Bi-weekly homework assignments are a required part of the course.
-\item Use this \href{https://pstat126.lsit.ucsb.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Frtargino%2Fucsb-pstat126&urlpath=rstudio%2F&branch=main}{link} to sync new assignments and labs.
+\item Use this \href{https://pstat126.lsit.ucsb.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Frtargino%2Fucsb-pstat126&urlpath=rstudio%2F&branch=main}{link} to sync new assignments and labs.%3A%2F%2Fgithub.com%2Frtargino%2Fucsb-pstat126&urlpath=rstudio%2F&branch=main}{link} to sync new assignments and labs.%2F%2Fgithub.com%2Frtargino%2Fucsb-pstat126&urlpath=rstudio%2F&branch=main}{link} to sync new assignments and labs.%2Fgithub.com%2Frtargino%2Fucsb-pstat126&urlpath=rstudio%2F&branch=main}{link} to sync new assignments and labs.%2Frtargino%2Fucsb-pstat126&urlpath=rstudio%2F&branch=main}{link} to sync new assignments and labs.%2Fucsb-pstat126&urlpath=rstudio%2F&branch=main}{link} to sync new assignments and labs.%2F&branch=main}{link} to sync new assignments and labs.
 \begin{itemize}
 \item {\color{red} Bookmark this link, you will use it a lot!}
 \end{itemize}
 
 \end{itemize}
 
+\vskip.15in \noindent\textbf{Office Hours:}
 
+\noindent Professor Targino \url{rodrigotargino@ucsb.edu}: Office Hours,
+Fridays 1.30pm - 3.30pm OG1230 and on Zoom
+\url{https://fgv-br.zoom.us/j/95030256507}
 
-\vskip.15in
-\noindent\textbf{Office Hours:}
+\noindent TBA {[}TA{]} \url{xxx@ucsb.edu}: Office Hours, TBA
 
-\noindent Professor Targino \url{rodrigotargino@ucsb.edu}: Office Hours, Fridays 1.30pm - 3.30pm OG1230 and on Zoom \url{https://fgv-br.zoom.us/j/95030256507} 
-
-\noindent TBA [TA] \url{xxx@ucsb.edu}: Office Hours, TBA
-
-\vskip.15in
-\noindent\textbf{Course Texts} 
+\vskip.15in \noindent\textbf{Course Texts}
 
 \begin{itemize}
 \item \textbf{Required:} Faraway, J. J. (2005) \textit{Linear Models with R}
 \item \textbf{R programming:} Grolemund and Wickham \textit{R for Data Science}, \url{https://r4ds.had.co.nz/index.html}
 \item Optional: Weisberg, S. (2005) {\textit{Applied Linear Regression,} 3rd edition}
-\end{itemize} 
+\end{itemize}
 
-\vskip.15in
-\noindent\textbf{Objectives:} 
-
-\vspace{1em}
-This course introduces the theory and application of linear regression models and uses R to solve real-world problems
-
-\vskip.15in
-\noindent\textbf{Prerequisites:}
+\vskip.15in \noindent\textbf{Objectives:}
 
 \vspace{1em}
-PSTAT 10 and PSTAT 120B both with a minimum grade of C or better. Familiarity with R is required.
+
+This course introduces the theory and application of linear regression
+models and uses R to solve real-world problems
+
+\vskip.15in \noindent\textbf{Prerequisites:}
+
+\vspace{1em}
+
+PSTAT 10 and PSTAT 120B both with a minimum grade of C or better.
+Familiarity with R is required.
 
 \vspace*{.15in}
 
 \noindent \textbf{Tentative Course Topics:}
+
 \begin{center}
 \begin{minipage}{5in}
 \begin{flushleft}
@@ -95,10 +174,10 @@ PSTAT 10 and PSTAT 120B both with a minimum grade of C or better. Familiarity wi
 \end{minipage}
 \end{center}
 
-<!-- \pagebreak -->
-
 \vspace*{.15in}
+
 \noindent\textbf{Grading Policy:}
+
 \begin{itemize}
 \item Homework (40\%).
   \begin{itemize}
@@ -133,19 +212,10 @@ PSTAT 10 and PSTAT 120B both with a minimum grade of C or better. Familiarity wi
     \item Generated PDF file
   \end{enumerate}
 \end{itemize}
-\vskip.15in
-\newpage
-<!-- \noindent\textbf{Important Dates:} -->
-<!-- \begin{center} \begin{minipage}{3.8in} -->
-<!--     \begin{flushleft} -->
-<!-- Midterm \dotfill ~ October 27, 2022 (take home)\\ -->
-<!-- Final Exam \dotfill ~ December 8, 2022 (take home)\\ -->
-<!-- \end{flushleft} -->
-<!-- \end{minipage} -->
-<!-- \end{center} -->
 
-\vskip.15in
-\noindent\textbf{Course Policies:}  
+\vskip.15in \newpage
+
+\vskip.15in \noindent\textbf{Course Policies:}
 
 \begin{itemize}
 \item Learning Cooperatively
@@ -174,3 +244,5 @@ PSTAT 10 and PSTAT 120B both with a minimum grade of C or better. Familiarity wi
 
 \end{itemize}
 \end{itemize}
+
+\end{document}
