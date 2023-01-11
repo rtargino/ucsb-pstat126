@@ -40,7 +40,7 @@ Winter 2023
 \item Nectir: \href{https://app.nectir.io/invite/frdqQD}{link}. We ask that when you have a question about the class that might be relevant to other students, post it on Nectir instead of emailing us. That way, all the staff can be on the same page and everyone can benefit from the response.
 \item JupyterHub: \href{https://pstat126.lsit.ucsb.edu/}{link}. All your work may be completed here.
 \item GradeScope: \href{https://www.gradescope.com}{link}. Bi-weekly homework assignments are a required part of the course.
-\item Use this \href{https://pstat126.lsit.ucsb.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Frtargino%2Fucsb-pstat126&urlpath=rstudio%2F&branch=main}{link} to sync new assignments and labs.
+\item Use this \href{https://shorturl.at/fgrt8}{link} to sync new assignments and labs.
 \begin{itemize}
 \item {\color{red} Bookmark this link, you will use it a lot!}
 \end{itemize}
@@ -54,7 +54,15 @@ Winter 2023
 
 \noindent Professor Targino \url{rodrigotargino@ucsb.edu}: Office Hours, Fridays 1.30pm - 3.30pm OG1230 and on Zoom \url{https://fgv-br.zoom.us/j/95030256507} 
 
-\noindent TBA [TA] \url{xxx@ucsb.edu}: Office Hours, TBA
+\noindent Chris	Lefrak [TA] \url{clefrak@ucsb.edu}: Office Hours, TBA
+
+\noindent Xubo Liu [TA] \url{xubo@ucsb.edu}: Office Hours, TBA
+
+\noindent Hao	Li [TA] \url{hao_li@ucsb.edu}: Office Hours, TBA
+
+\noindent Pippa Lin [ULA] \url{haitaolin@ucsb.edu}: Office Hours, TBA
+
+\noindent Brandelyn Nie [ULA] \url{bhnie@ucsb.edu}: Office Hours, TBA
 
 \vskip.15in
 \noindent\textbf{Course Texts} 
