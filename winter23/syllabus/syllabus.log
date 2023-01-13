@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.12) (preloaded format=pdflatex 2023.1.8)  10 JAN 2023 19:43
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.12) (preloaded format=pdflatex 2023.1.8)  13 JAN 2023 14:33
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -572,19 +572,19 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <7> on input line 99.
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <5> on input line 99.
-LaTeX Font Info:    Trying to load font information for U+ding on input line 17
-6.
+LaTeX Font Info:    Trying to load font information for U+ding on input line 18
+0.
 (C:\Users\targi\AppData\Local\Programs\MiKTeX\tex/latex/bbding\uding.fd
 File: Uding.fd 1996/02/01 v1.0 BBding font definitions
 ) [1
 
 {C:/Users/targi/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}]
-Underfull \hbox (badness 10000) in paragraph at lines 221--222
+Underfull \hbox (badness 10000) in paragraph at lines 225--226
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 222--223
+Underfull \hbox (badness 10000) in paragraph at lines 226--227
 
  []
 
@@ -602,7 +602,7 @@ Package rerunfilecheck Info: File `syllabus.out' has not changed.
 Here is how much of TeX's memory you used:
  13608 strings out of 476406
  220603 string characters out of 2789568
- 1866787 words of memory out of 3000000
+ 1868787 words of memory out of 3000000
  33806 multiletter control sequences out of 15000+600000
  514020 words of font info for 38 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -614,9 +614,9 @@ c/amsfonts/cm/cmbx10.pfb><C:/Users/targi/AppData/Local/Programs/MiKTeX/fonts/ty
 pe1/public/amsfonts/cm/cmcsc10.pfb><C:/Users/targi/AppData/Local/Programs/MiKTe
 X/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/targi/AppData/Local/Progra
 ms/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb>
-Output written on syllabus.pdf (3 pages, 85730 bytes).
+Output written on syllabus.pdf (3 pages, 87487 bytes).
 PDF statistics:
- 73 PDF objects out of 1000 (max. 8388607)
+ 78 PDF objects out of 1000 (max. 8388607)
  7 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

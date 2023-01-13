@@ -52,17 +52,17 @@ Winter 2023
 \vskip.15in
 \noindent\textbf{Office Hours:}
 
-\noindent Professor Targino \url{rodrigotargino@ucsb.edu}: Office Hours, Fridays 1.30pm - 3.30pm OG1230 and on Zoom \url{https://fgv-br.zoom.us/j/95030256507} 
+\noindent Professor Targino \url{rodrigotargino@ucsb.edu}: Fridays 1.30pm - 3.30pm OG1230 and on Zoom \url{https://fgv-br.zoom.us/j/95030256507} 
 
-\noindent Chris	Lefrak [TA] \url{clefrak@ucsb.edu}: Office Hours, TBA
+\noindent Chris	Lefrak [TA] \url{clefrak@ucsb.edu}: 9:30am-11:30am on Thursdays in Building 434 Room 113
 
-\noindent Xubo Liu [TA] \url{xubo@ucsb.edu}: Office Hours, TBA
+\noindent Xubo Liu [TA] \url{xubo@ucsb.edu}: Monday 11:30-1:30pm in South Hall 5421 (StatLab)
 
-\noindent Hao	Li [TA] \url{hao_li@ucsb.edu}: Office Hours, TBA
+\noindent Hao	Li [TA] \url{hao_li@ucsb.edu}: Wednesday 12:30 pm to 2:30 pm (via zoom for now, later South Hall 5431T) \url{https://ucsb.zoom.us/j/84693261625?pwd=aVlsVWt3dEhTWHFubDNkR3kwSFdndz09}
 
-\noindent Pippa Lin [ULA] \url{haitaolin@ucsb.edu}: Office Hours, TBA
+\noindent Pippa Lin [ULA] \url{haitaolin@ucsb.edu}: Tuesday 5-7pm in Building434 Room126, and Friday 11am-2pm via Zoom, \url{https://ucsb.zoom.us/j/89172292465}
 
-\noindent Brandelyn Nie [ULA] \url{bhnie@ucsb.edu}: Office Hours, TBA
+\noindent Brandelyn Nie [ULA] \url{bhnie@ucsb.edu}: Wednesday 3-5pm and Friday 4-7pm \url{https://ucsb.zoom.us/j/4907241371}
 
 \vskip.15in
 \noindent\textbf{Course Texts} 
