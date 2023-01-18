@@ -1,0 +1,68 @@
+---
+title: "Homework 1"
+subtitle:  "PSTAT 126 Winter 2023"
+author: "Due date: January 31st, 2023 at 23:59 PT"
+output: pdf_document
+---
+
+```{r setup, echo=FALSE}
+library(knitr)
+# set global chunk options: images will be 7x5 inches
+knitr::opts_chunk$set(fig.width=7, fig.height=5)
+options(digits = 4)
+
+
+## indents are for indenting r code as formatted text
+## They may need to be adjusted depending on your OS
+# if your output looks odd, increase or decrease indent
+indent1 = '    '
+indent2 = '        '
+indent3 = '            '
+```
+
+1. The dataset *trees* contains measurements of *Girth* (tree diameter) in inches, *Height* in feet, and *Volume* of timber (in cubic feet) of a sample of 31 felled black cherry trees. The following commands can be
+used to read the data into R.
+
+```{r data1}
+# the data set "trees" is contained in the R package "datasets"
+require(datasets)
+head(trees)
+```
+
+(a) (1pt) Briefly describe the data set *trees*, i.e., how many observations (rows) and how many variables (columns) are there in the data set? What are the variable names?
+(b) (2pts) Use the *pairs* function to construct a scatter plot matrix of the logarithms of Girth, Height and Volume.
+(c) (2pts) Use the *cor* function to determine the correlation matrix for the three (logged) variables.
+(d) (2pts) Are there missing values?
+(e) (2pts) Use the *lm* function in R to fit the multiple regression model:
+
+$$\log (Volume_i)=\beta_0 + \beta_1\log(Girth_i)+\beta_2\log(Height_i) + \epsilon_i$$
+and print out the summary of the model fit.
+
+(f) (3pts) Create the design matrix (i.e., the matrix of predictor variables), $X$, for the model in (e), and verify that the least squares coefficient estimates in the summary output are given by the least squares
+formula: $\hat{\beta}=(X^TX)^{-1}X^Ty$.
+(g) (3pts) Compute the predicted response values from the fitted regression model, the residuals, and an estimate of the error variance $Var(\epsilon)=\sigma^2$.
+
+2. Consider the simple linear regression model:
+
+$$\qquad y_i = \beta_0+\beta_1x_i+\epsilon_i$$
+
+**Part 1: $\beta_0=0$ **
+
+(a) (3pts) Assume $\beta_0=0$. What  is the interpretation of this assumption? What is the implication on the regression line? What does the regression line plot look like?
+(b) (4pts) Derive the LS estimate of $\beta_1$ when $\beta_0=0$.
+(c) (3pts) How can we introduce this assumption within the *lm* function?
+
+**Part 2: $\beta_1=0$**
+
+(d) (3pts) For the same model, assume $\beta_1=0$. What  is the interpretation of this assumption? What is the implication on the regression line? What does the regression line plot look like?
+(e) (4pts)Derive the LS estimate of $\beta_0$ when $\beta_1=0$.
+(f) (3pts)How can we introduce this assumption within the *lm* function?
+
+3. Consider the simple linear regression model:
+
+$$\qquad y_i = \beta_0+\beta_1x_i+\epsilon_i$$
+
+(a) (10pts) Use the LS estimation general result $\hat{\beta}=(X^TX)^{-1}X^Ty$ to find the explicit estimates for $\beta_0$ and $\beta_1$.
+(b) (5pts) Show that the LS estimates $\hat{\beta}_0$ and $\hat{\beta}_1$ are unbiased estimates for $\beta_0$ and $\beta_1$ respectively.
+
+
