@@ -1,0 +1,109 @@
+---
+title: "Lab 6"
+author: "PSTAT126"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message=FALSE, warning=FALSE}
+library("alr4")
+library("MASS")
+```
+
+### Consider the variable selection for a regression model:
+
+From Highway data in package we try to model the 'rate' variable (accident rates per million vehicle miles, 1973) on other predictors.
+
+After checking for correlaton of the response rate with the other numerical variables, the chosen top 3 covariates for the model are: acpt (0.752), sigs (0.564), slim (-0.681), the correlation with the response are given in the parentheses. 
+
+```{r}
+pairs(Highway[,c("acpt","sigs","slim","rate")])
+fit<- lm(rate~ acpt + sigs + slim + acpt:sigs + acpt:slim + sigs:slim , data = Highway) # We include all the interactions
+
+summary(fit)
+```
+Remove the predictor with highest p-value iteratively;
+
+```{r}
+fit<- lm(rate~ acpt + sigs + slim + acpt:sigs + sigs:slim , data = Highway) # We remove acpt:slim 
+summary(fit)
+
+fit<- lm(rate~ acpt + sigs + slim + acpt:sigs , data = Highway)  
+summary(fit)
+
+fit<- lm(rate~ acpt + sigs + slim, data = Highway)
+summary(fit)
+
+fit<- lm(rate~ acpt + slim, data = Highway)
+summary(fit)
+
+```
+
+## Diagnostic plots:
+
+```{r}
+par(mfrow=c(2,2))
+plot(fit$fitted.values, fit$residuals)
+abline(h=0, col="red")
+
+plot(Highway$acpt, fit$residuals)
+abline(h=0, col="red")
+
+plot(Highway$slim, fit$residuals)
+abline(h=0, col="red")
+
+qqnorm(fit$residuals)
+qqline(fit$residuals, col="red")
+
+```
+
+```{r}
+par(mfrow=c(2,2))
+plot(hatvalues(fit), cooks.distance(fit), xlab="Leverages", ylab="Cook's Distance")
+
+plot(hatvalues(fit), type = 'h',xlab = "Observation")
+
+plot(cooks.distance(fit), type = "h", xlab ="Observation")
+
+```
+
+## Box-Cox transformation
+```{r}
+boxcox(fit, plotit=T, lambda=seq(-1,1,len=100))
+```
+
+Therefore, take log transformation on the response
+
+```{r}
+fit<- lm(log(rate)~ acpt + slim, data = Highway)
+summary(fit)
+
+par(mfrow=c(2,2))
+plot(fit$fitted.values, fit$residuals)
+abline(h=0, col="red")
+
+plot(Highway$acpt, fit$residuals)
+abline(h=0, col="red")
+
+plot(Highway$slim, fit$residuals)
+abline(h=0, col="red")
+
+qqnorm(fit$residuals)
+qqline(fit$residuals, col="red")
+
+```
+
+
+```{r}
+par(mfrow=c(2,2))
+plot(hatvalues(fit), cooks.distance(fit), xlab="Leverages", ylab="Cook's Distance")
+
+plot(hatvalues(fit), type = 'h',xlab = "Observation")
+
+plot(cooks.distance(fit), type = "h", xlab ="Observation")
+
+```
+

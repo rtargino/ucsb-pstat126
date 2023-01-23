@@ -1,0 +1,188 @@
+---
+title: "PSTAT 126"
+subtitle: "Lab4"
+date: "10/25/2022"
+output: pdf_document
+---
+
+
+```{r setup, include = FALSE}
+# default code chunk options
+knitr::opts_chunk$set(echo = T,
+                      results = 'markup',
+                      message = F, 
+                      warning = F,
+                      fig.width = 4,
+                      fig.height = 3,
+                      fig.align = 'center') 
+
+# load packages
+library(faraway)
+library(tidyverse)
+library(tidymodels)
+library(modelr)
+```
+
+```{r}
+data(state)
+statedata <- data.frame(state.x77, row.names = state.abb)
+head(statedata)
+# Can use the . to indicate to include all the other variables in your model
+lmod <- lm(Life.Exp ~ ., statedata)
+summary(lmod)
+```
+
+###  Accuracy of the model
+
+$$R^2= 1-\frac{\sum_{i=1}^n(y_i - \hat{y}_i)^2}{\sum_{i=1}^n(y_i - \bar{y})^2}= 1-\frac{SSR}{SST}$$
+```{r}
+# summary output Rˆ2
+summary(lmod)$r.squared
+# calculate Rˆ2 by hand
+y <- statedata$Life.Exp # Response values
+y_hat <- fitted(lmod) # Fitted Values
+y_bar <- mean(y)
+SSR <-sum((y - y_hat)^2)
+SST <- sum((y - y_bar)^2)
+r_2 <- 1 - SSR/SST
+r_2
+# Rˆ2=cor(y_hat,y)ˆ2
+cor(y_hat,y)^2
+```
+
+### Hypothesis Testing
+
+- Is a specific predictor useful in predicting Y? t-test
+
+```{r}
+n <- dim(statedata)[1] # number of observations, or equivalently use nrow(statedata)
+p <- 7 # number of predictors
+round(coefficients(summary(lmod)), 5)
+
+```
+
+Let’s double check HS.Grad t-value and p-value
+
+```{r}
+# summary output t - value
+coefficients(summary(lmod))[6,3]
+# calculate t - value by hand
+t_value <- coefficients(summary(lmod))[6,1]/coefficients(summary(lmod))[6,2]
+t_value
+# summary output p - value
+coefficients(summary(lmod))[6,4]
+# calculate p - value by hand
+p_value = pt(q = -t_value, df = n - p - 1) * 2
+p_value
+```
+
+- Is at least one of the predictors useful in predicting Y? F-test
+
+
+### Global F test
+
+```{r}
+mod_M <- lm(Life.Exp ~ ., statedata) # Larger model with all the predictors
+mod_m <- lm(Life.Exp ~ 1, statedata) # Smaller model with only intercept
+anova(mod_m, mod_M) # Global F - Test
+(F_value <- ((88.299 - 23.297)/7)/(23.297/42))
+summary(mod_M)
+```
+
+## Partial F Test
+
+- Want to test the null hypothesis that $\beta_{HS.Grad} = \beta_{Frost} = 0$
+
+```{r}
+mod_M <- lm(Life.Exp ~ ., statedata) # Larger model with all the predictors
+mod_m <- lm(Life.Exp ~ Population +
+Income +
+Illiteracy +
+Murder +
+Area, statedata) # smaller model without HS.Grad and Frost
+anova(mod_m, mod_M)
+```
+
+- Now lets test the null hypothesis that $\beta_{income} = \beta_{Area} = \beta_{Illiteracy} = 0$
+
+```{r}
+mod_M <- lm(Life.Exp ~ ., statedata) # Larger model with all the predictors
+mod_m <- lm(Life.Exp ~ Population +
+Murder +
+HS.Grad +
+Frost, statedata) # smaller model without Income, Area, and Illiteracy
+anova(mod_m, mod_M)
+```
+
+
+
+
+
+The lab uses the now-familiar SAT data throughout. 
+
+ data from `faraway` on 1998 per capita income for each U.S. state and the proportion of residents of each state born in the U.S. as of the 1990 census. By now, this should be a familiar plot:
+
+
+## Checking model assumptions
+
+
+```{r, echo = T}
+# naive fit -- maybe linear is good enough
+fit_naive <- lm(total ~ takers + expend, data = sat)
+
+# augment function adds residuals, fitted, and case influence stats
+augment(fit_naive, sat) %>% head(4)
+```
+
+Recall from lecture that the three 'classic' diagnostic plots are:
+
+1. Residuals versus fitted values
+2. Residuals versus predictors
+3. Quantile-quantile plot
+
+It is convenient to present plots (1) and (2) in a panel, since all of these are scatterplots with the residuals on the `y` axis. To do so, pivot the predictors and the fitted values, and then facet. Adding a horizontal line at zero helps, as ideally we'd like to see the residuals spread evenly around that line.
+```{r, echo = T, fig.width = 8, fig.height = 3}
+# panel of residual plots
+augment(fit_naive, sat) %>%
+  pivot_longer(cols = c(.fitted, takers, expend)) %>%
+  ggplot(aes(y = .resid, x = value)) +
+  facet_wrap(~ name, scales = 'free_x') +
+  geom_point() +
+  geom_hline(aes(yintercept = 0))
+```
+
+Notice that the non-linearity in `takers` appears as a pattern in *both* the residual-fit plot *and* the residual-predictor plot. Ostensibly, the leftmost panel indicates there is some nonlinearity, and then the rightmost panel points to which variable is the culprit. It won't always work out so nicely, but sometimes these patterns are really clear and unambigous -- there's definitely a parabolic shape to the residuals in `takers`, so that predictor should probably enter quadratically into the model.
+
+Sometimes it can be useful to add a smoothed trend line to help visualize the pattern:
+```{r, echo = T, fig.width = 8}
+# sometimes a smoother helps (but beware the span!)
+augment(fit_naive, sat) %>%
+  pivot_longer(cols = c(.fitted, takers, expend)) %>%
+  ggplot(aes(y = .resid, x = value)) +
+  facet_wrap(~ name, scales = 'free_x') +
+  geom_point() +
+  geom_hline(aes(yintercept = 0)) +
+  geom_smooth(method = 'loess', formula = 'y ~ x', se = F, span = 1)
+```
+
+
+It's perhaps questionable, but we can observe a slight parabolic pattern to `expend`. You may recall adding this term and finding that it was not a statistically significant predictor; however, despite that, it does appear to be needed for correct model specification. It's interesting to consider that sometimes non-significant predictors should still be included in a model.
+
+So let's add that term:
+```{r, echo = T}
+# add quadratic term in expenditure
+fit <- lm(total ~ poly(expend, 2, raw = T) + poly(takers, 2, raw = T), data = sat)
+```
+
+
+
+Let's assume that there are no additional problems in these plots ((1) and (2)). Given, then, that the model appears adequately specified and there are no obvious problems with the constant variance assumption, we can check the normality assumption. The quantile-quantile plot is simple to construct:
+```{r}
+# normality check
+augment(fit, sat) %>%
+  ggplot(aes(sample = .resid)) +
+  geom_qq() +
+  geom_qq_line()
+```
+
+

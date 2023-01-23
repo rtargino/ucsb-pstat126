@@ -1,0 +1,236 @@
+---
+title: "Computing OLS without lm(), CIs, Plots"
+author: "PSTAT126"
+date: "Lab 2"
+output:
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+
+
+```{r}
+library(tidyverse) # Easily Install and Load the 'Tidyverse'
+library(palmerpenguins) # Palmer Archipelago (Antarctica) Penguin Data
+```
+
+
+
+## Computing OLS estimators in simple linear regression (without lm()) : Lecture 1 Slide 39
+
+#### Dataset: Adelie and Gentoo Penguins   
+
+- **Question: Can we predict body mass in grams by a penguins bill length in mm?**
+
+```{r}
+data("penguins")
+
+penguins_noChinstrap <- penguins %>% 
+  filter(species != "Chinstrap") %>% 
+  drop_na(bill_length_mm, body_mass_g)
+
+str(penguins_noChinstrap)
+summary(penguins_noChinstrap)
+
+# plot of data
+
+plot(penguins_noChinstrap$bill_length_mm, penguins_noChinstrap$body_mass_g , 
+     col = "blue", xlab ="", ylab="")
+```
+
+```{r}
+x <- penguins_noChinstrap$bill_length_mm
+y <- penguins_noChinstrap$body_mass_g
+```
+
+\newpage
+
+First obtain means of $x$ and $y$
+```{r}
+x_bar <- mean(x) 
+y_bar <- mean(y)
+```
+
+$$S_{xx} :\Sigma_{i = 1}^n (x_i - \bar{x})^2$$ 
+```{r}
+Sxx <- sum((x - x_bar)^2)
+Sxx
+```
+$$S_{yy} :\Sigma_{i = 1}^n (y_i - \bar{y})^2$$ 
+```{r}
+Syy <- sum((y - y_bar)^2)
+Syy
+```
+
+$$S_{xy} :\Sigma_{i = 1}^n (x_i - \bar{x})(y_i - \bar{y})$$
+```{r}
+Sxy <- sum((x - x_bar)*(y - y_bar))
+Sxy
+```
+
+$$\hat\beta_1 = S_{xy}/S_{xx}$$
+```{r}
+b1 <- Sxy / Sxx
+b1
+```
+
+
+$$\hat\beta_0 = \bar{y} - \hat\beta_1\bar{x}$$
+```{r}
+b0 <- y_bar - b1*x_bar
+b0
+```
+
+$$\hat{Y} = \hat\beta_0 + \hat\beta_1x$$
+```{r}
+y_hat <- b0 + b1*x
+```
+
+**Estimation of Residuals**  
+$$e_i = y_i - \hat{y}$$  
+  
+```{r}
+e <- y - y_hat
+```
+
+$$\hat\sigma^2 = \frac{1}{N-2}\Sigma_{i = 1}^n e_n^2$$
+
+
+```{r}
+n <- length(y)
+sigma_2_hat <- sum(e^2) / (n-2)
+sigma_2_hat
+sqrt(sigma_2_hat) # Residual Standard Error (RSE)
+```
+
+
+\newpage
+## The lm() function
+
+```{r}
+model <- lm(body_mass_g ~ bill_length_mm , data = penguins_noChinstrap)
+```
+
+
+```{r}
+summary(model)
+```
+
+\newpage
+
+```{r}
+coef(model) # Estimates for b0 and b1
+model$coefficients
+```
+
+
+```{r}
+head(residuals(model)) # residuals
+head(fitted(model)) # y_hat values
+
+summary(residuals(model)) # First line in summary output.
+```
+
+
+```{r}
+# Standard errors
+summary(model)$coef[,2]
+coef(summary(model))[, "Std. Error"]
+```
+
+
+
+
+```{r}
+summary(model)$sigma^2
+```
+
+\newpage
+
+## Confidence Intervals for intercept and slope estimates 
+
+Can calculate a 90% confidence interval by entering values into formula:
+
+* **Intercept**
+
+$$\hat\beta_0 \pm (t_{\alpha/2, N-2}\boldsymbol{SE}(\hat\beta_0))$$
+
+* **Slope**
+
+$$\hat\beta_1 \pm (t_{\alpha/2, N-2}\boldsymbol{SE}(\hat\beta_1))$$
+
+```{r}
+n <- length(x)
+sigma_2_hat <- sum(e^2) / (n-2)
+sigma_hat <- sqrt(sigma_2_hat) 
+Sxx <- sum((x - x_bar)^2)
+
+se_b0 <- sqrt(sigma_2_hat*(1/n + 
+                             (x_bar^2)/Sxx)) # se of intercept
+se_b1 <-  sqrt(sigma_2_hat/Sxx) # se of slope
+
+t_pct <- qt(p = 0.95, df = n - 2) # t-statistic
+```
+
+
+```{r}
+CI_b0_90 <-  c(b0 - t_pct*se_b0, b0 + t_pct*se_b0) # 90% CI for b0
+CI_b1_90 <-  c(b1 - t_pct*se_b1, b1 + t_pct*se_b1) # 90% CI for b1
+CI_b0_90
+CI_b1_90
+```
+
+
+Can also use the `confint` function
+```{r}
+#?confint
+confint(model, level = 0.95) # 95% CI
+
+confint(model, level = 0.90) # 90% CI
+
+```
+
+\newpage
+
+
+
+## Plots
+
+
+```{r}
+plot(body_mass_g ~ bill_length_mm , data = penguins_noChinstrap,
+     main = "Plot with fitted values")
+abline(model, col = "Red")
+```
+
+
+
+
+
+
+
+
+## Stat500 Data
+
+```{r}
+library(faraway)
+head(stat500)
+fit <- lm(total ~ final, data=stat500)
+
+plot(stat500$final,stat500$total)
+abline(fit)
+
+par(mfrow=c(2,2))
+plot(fit) #residual graph
+
+
+
+summary(fit)
+
+```
+
+
+

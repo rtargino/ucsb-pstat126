@@ -1,0 +1,113 @@
+---
+title: "PSTAT 126 Lab 7"
+author: ""
+date: "Fall 2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Qualitative Predictor
+```{r}
+library(faraway)
+head(teengamb)
+```
+This $teengamb$ dataset is a survey about teenage gambling in Britain. The $sex$ is $0$ for male and $1$ for female. The $status$ is socioeconomic status score based on parents' occupation, $income$ is income in pounds per week, $verbal$ is verbal score in words out of $12$ correctly difined, and $gamble$ is expenditure on gambling in pounds per year. In this dataset, $sex$ is qualitative, so we will need to transform it from integer to factor. The rest are quantitative. \
+Now we use $gamble$ as the response and the rest as predictors to fit a MLR model to the data: \
+```{r}
+mod=lm(gamble~factor(sex)+status+income+verbal,data=teengamb)
+summary(mod)
+contrasts(factor(teengamb$sex))
+example = c("F", "M")
+contrasts(factor(example))
+```
+Here, the factor level $0$ (male) for sex is the baseline level. The regression coefficient of $factor(sex)1$ is $-22.11833$, which should be interpreted like holding all other predictors fixed, on average one female spends $22.11833$ pounds per year less than one male on gambling. \
+Next we fit a model to predict $gamble$ using $sex$ and $income$ as well as an interaction term between them. \
+```{r}
+mod2=lm(gamble~factor(sex)*income,teengamb)
+summary(mod2)
+
+```
+Our fitted model is now: 
+\[\hat{\text{gamble}}=-2.6596+5.7996*I(\text{sex=female})+6.5181*\text{income}-6.3432*\text{income}*I(\text{sex=female}).\]
+And in this model, for a female, if $income$ increases by $1$ unit, then the $gamble$ will increase by $6.5181-6.3432=0.1749$. \
+
+# Model Selection
+#### Data from Faraway book (Chapter 10)
+
+* Suppose the intercept is included in the model. For the remaining p - 1 covariates (predictors) , they could be in the model or out. Then in total we have $2^{p-1}$ choices. When p = 8, we have 128 potential models (not counting interaction or polynomial terms!).  
+
+
+```{r}
+data(state)
+statedata <- data.frame(state.x77, row.names = state.abb)
+head(statedata)
+lmod <- lm(Life.Exp ~ ., statedata)
+summary(lmod)
+```
+
+\newpage
+
+```{r, echo = FALSE, warning=FALSE}
+library(leaps)
+library(ggplot2)
+b <- regsubsets(formula(lmod),
+                data=statedata)
+rs <- summary(b) # for each model of size p+1, chooses the model with the lowest RSS value.
+
+ggplot(data = data.frame(rs$rss), aes(x = 2:8, y =rs$rss)) +
+  geom_point(colour = "red", size = 1.5) +
+  geom_label(aes(label= round(rs$rss, 3)), size = 3.1, nudge_y = 0.75 ) +
+  scale_x_continuous(breaks = seq(2,8,1)) +
+  labs(x = "Number of predictors (plus intercept)", y = "SSR") +
+  ggtitle("SSR" )
+
+ggplot(data = data.frame(rs$rsq), aes(x = 2:8, y =rs$rsq)) +
+  geom_point(colour = "red", size = 1.5) +
+  geom_label(aes(label= round(rs$rsq, 4)), size = 3.1, nudge_y = 0.01 ) +
+  scale_x_continuous(breaks = seq(2,8,1)) +
+  labs(x = "Number of predictors (plus intercept)", y = "R^2",
+       caption = "Can see that as we add predictors to our model R^2 will always increase and\nSSR will always decrease thus need other criteria to perform model selection.") +
+  ggtitle("R^2") +
+  theme(plot.caption = element_text(size = 12))
+
+```
+
+
+\newpage
+#### Stepwise Model Selection
+
+* Forward selection
+  + Start with no variables (just intercept)
+  + Add one variable at a time according to some criterion
+  + Stop when no more variables should be added
+* Backward selection
+  + Start with a Full model with all possible predictors
+  + Remove one variable at a time according to some criterion
+  + Stop when no more variables should be dropped
+
+##### Example of Forward selection using p-values
+* Let $\alpha = 0.10$ be our stopping criteria. 
+
+```{r}
+mod0 <- lm(Life.Exp ~ 1, statedata)
+add1(mod0, ~.+Population+Income+Illiteracy+Murder+HS.Grad+Frost+Area, test = "F")
+
+mod1 <- update(mod0, ~.+Murder)
+add1(mod1, ~.+Population+Income+Illiteracy+HS.Grad+Frost+Area, test = "F")
+
+mod2 <- update(mod1, ~.+HS.Grad)
+add1(mod2, ~.+Population+Income+Illiteracy+Frost+Area, test = "F")
+
+mod3 <- update(mod2, ~.+Frost)
+add1(mod3, ~.+Population+Income+Illiteracy+Area, test = "F")
+
+mod4 <- update(mod3, ~.+Population)
+add1(mod4, ~.+Income+Illiteracy+Area, test = "F")
+
+anova(mod3, mod4)
+summary(mod4)
+
+```

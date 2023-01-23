@@ -1,0 +1,118 @@
+---
+title: "PSTAT 126 Lab 5"
+subtitle: "Diagnostics"
+date: "11/1/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Model Assumptions
+
+
+The estimation of and inference from the regression model depend on several assumptions. These assumptions
+should be checked using diagnostics. We divide the potential problems into three categories:
+
+* **Random Error**: We assume that $\epsilon_i$'s are $i.i.d$ normal variables.
+* **Unusual Observations** We assume all the observations follow our regression model however a few observations do not, and might change the choice and fit of the model. 
+* **Model Structure**: We assume linear relationship between the response and predictor variables.
+
+
+```{r, include=TRUE, echo=TRUE}
+library(faraway)
+head(diabetes)
+diabetes1<- na.omit(diabetes)
+lmod=lm(stab.glu~chol+hdl+glyhb+age +waist+ bp.1s + bp.1d + bp.2s +bp.2d, +waist, data=diabetes1)
+summary(lmod)
+```
+
+## Checking Error Assumptions
+### Constant Variance (Homoscedasticity)
+If everything is well, we should see constant symmetrical variation. Non constant variance (heteroscedasticity)
+or nonlinear pattern indicates that the constant variance assumption is questionable.
+
+
+```{r, include=TRUE, echo=TRUE}
+plot(fitted(lmod),residuals(lmod),xlab='Fitted',ylab='Residuals')
+abline(h=0)
+car::ncvTest(lmod) # Null hypothesis = constant error variance
+```
+
+## Normality
+We can use QQ plot or Shapiro-Wilk test to check normality. 
+
+```{r, include=TRUE, echo=TRUE}
+qqnorm(residuals(lmod),ylab='Residuals',main='')
+qqline(residuals(lmod))
+shapiro.test(residuals(lmod))
+```
+## Correlated errors
+
+```{r, include=TRUE, echo=TRUE}
+plot(seq(1, dim(diabetes1)[1],1), residuals(lmod), xlab="Index", ylab="Residuals")
+acf(residuals(lmod), type="partial")
+
+```
+
+
+## Finding Unusual Observations
+### Leverage
+
+A high-leverage point is extreme in the predictor space. It has the potential to influence the fit, but does not
+necessarily do so. It is important to first identify such points. Deciding what to do about them can be difficult.
+
+Recall that $H_{ii}$ is the leverage of $x_i$. And $\sum_{i=1}^n H_{ii} = p^*=p + 1$, this can be easily proved using linear algebra knowledge. So the average value for leverage is $p^*/n$. A rough rule is that high leverages points will be identified as such if $H_{ii}>kp^*/n$, with $k=2$ or $k=3$.
+
+```{r, include=TRUE, echo=TRUE}
+lev=hatvalues(lmod)
+head(lev)
+n<-length(lev)
+p<-dim(model.matrix(lmod))[2]
+dat=data.frame(index=seq(n),leverage=lev)
+plot(leverage~index,col="white",data=dat,pch=NULL)
+text(leverage~index,labels = index,data=dat,cex=0.9,font=2)
+abline(h=(p)/n,col ="blue")
+abline(h=3*(p)/n,col="red")
+abline(h=2*(p)/n,col="orange")
+```
+
+## Outliers
+An outlier is a point that does not fit the current model well. Here we consider the standardized residuals
+$$r_i= \frac{y_i-\hat y_i}{\hat\sigma\sqrt{1-H_{ii}}}$$
+The rule of thumb is that observations with absolute value of standardized residuals greater than or equal to
+3 are considered as outliers.
+
+```{r, include=TRUE, echo=TRUE}
+r=rstandard(lmod)
+r.a<- abs(r)
+which(abs(r)>=3)
+dat2=data.frame(index=seq(n), resi= r.a)
+plot(r.a~index,col="white",data=dat2,pch=NULL,ylim=c(0,3.5))
+text(r.a~index,labels = index,data=dat2,cex=0.9,font=2)
+abline(h=3,col="red")
+```
+
+## Influential Observations
+An influential point is one whose removal from the dataset would cause a large change in the fit. An influential
+point may or may not be an outlier and may or may not have large leverage, but it will tend to have at least
+one of these two properties. We usually use Cook’s distance.
+$$D_i=\frac{1}{p^*}r_i^2\frac{H_{ii}}{1-H_{ii}}$$
+One rule of thumb is that observations with Cook’s distance greater than $4/n$ is influential.
+
+```{r, include=TRUE, echo=TRUE}
+d=cooks.distance(lmod)
+dat3=data.frame(index=seq(length(r)),distance=d)
+plot(distance~index,col="white",data=dat3,pch=NULL,ylim=c(0,0.35))
+text(distance~index,labels = index,data=dat3,cex=0.9,font=2)
+abline(h=4/n,col="red")
+which(d>4/n)
+```
+
+## Diagnostic sumary
+
+```{r, include=TRUE, echo=TRUE,out.width='\\textwidth', fig.width=10,fig.height=7}
+par(mfrow=c(2,2))
+plot(lmod, c(1,2,4,5))
+```

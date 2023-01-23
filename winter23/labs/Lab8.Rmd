@@ -1,0 +1,144 @@
+---
+title: "PSTAT 126 Lab 8"
+author: ""
+date: "Fall 2022"
+output: pdf_document
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r}
+data(state)
+statedata <- data.frame(state.x77, row.names = state.abb)
+head(statedata)
+```
+
+# Model Selection
+Last time we talked about how to do model selection by looking at t-tests for each predictors. Now let us focus more on other criteria. 
+
+### Akaike Information Criterion
+$$AIC= n\log(SSR/n)+2d$$
+
+### Bayes Information Criterion
+$$BIC= n\log(SSR/n)+d\log(n)$$
+
+Notes that BIC puts heavier penalty on model with many variables than AIC, it tends to choose a simpler model. 
+
+## Stepwise Regression based on AIC and BIC
+
+```{r}
+library(MASS)         
+
+#step wise Regression
+full_mod = lm(Life.Exp ~ Population+Income+Illiteracy+Murder+HS.Grad+Frost+Area, statedata)
+none_mod =lm(Life.Exp ~ 1, statedata)
+
+
+## Based on AIC - We set k=2
+stepAIC(none_mod, scope=list(upper=full_mod), direction="forward", k=2)  
+stepAIC(full_mod, direction="backward", k=2)
+stepAIC(none_mod, scope=list(upper=full_mod), direction="both", k=2)
+
+#selection based on BIC - We set k=log(n)
+stepAIC(none_mod, scope=list(upper=full_mod), direction="forward", k=log(length(statedata$Life.Exp)))
+stepAIC(full_mod, direction="backward", k=log(length(statedata$Life.Exp)))
+stepAIC(none_mod, scope=list(upper=full_mod), direction="both", k=log(length(statedata$Life.Exp)))
+
+```
+
+
+# Shrinkage Methods
+
+#### Dataset
+The dataset for analysis is the Major League Baseball Data from the 1986 and 1987 seasons, which consists
+of 322 observations of major league players on 20 variables including the number of hits, number of errors, annual salary etc. Before proceeding, we first import required packages and ensure that the missing values have been removed.
+
+```{r}
+#import required packages
+library(ISLR)
+library(glmnet)
+library(dplyr)
+library(tidyr)
+# ensure that any observation with missing values are removed
+Hitters = na.omit(Hitters)
+```
+We will perform ridge regression and the lasso later in order to predict Salary on the Hitters data. Let’s set up our data first.
+
+```{r}
+x = model.matrix(Salary~., Hitters)[,-1]
+y = Hitters$Salary
+```
+The *model.matrix()* function is particularly useful for creating x from a given data set; not only does it produce a matrix corresponding to the 19 predictors but it also automatically transforms any qualitative variables into dummy variables. The latter property is important because glmnet() can only take numerical, quantitative inputs.
+
+## Ridge Regression and Lasso Regression
+
+Ridge and lasso can be accomplished using the glmnet package. The main function in this package is
+glmnet(), which can be used to fit ridge regression models, lasso models, and more. This function has
+slightly different syntax from other model-fitting functions. In particular, we must pass in an x (as predictors matrix) as well as a y (response vector), and we do not use the $y \sim x$ syntax.
+
+
+### Ridge Regression
+
+```{r}
+# ridge example
+grid = 10^seq(10, -2, length = 100)
+ridge_mod = glmnet(x, y, alpha = 0, lambda = grid)
+```
+
+
+1. glment function
+
+Arguments in glmnet fuction:
+
+- alpha: The glmnet() function has an alpha argument that determines what type of model is fit. If alpha
+= 0 then a ridge regression model is fit, and if alpha = 1 (which is the default value, i.e., if you don’t specify the value of alpha) then a lasso model is fit.
+- lambda: By default the glmnet() function performs regression for an automatically selected range of $\lambda$ values. However, in above example, we have chosen to implement the function over a grid of values ranging from  $\lambda = 10^{10}$ to $\lambda = 10^{-2}$, essentially covering the full range of scenarios from the null model ($\lambda$ is very large) containing only the intercept, to the least squares fit ($\lambda$ is 0).
+- standardize: By default, the glmnet() function standardizes the variables so that they are on the same
+scale. To turn off this default setting, use the argument standardize = FALSE.
+
+glmnet output:
+
+Associated with each value of $\lambda$  is a vector of ridge regression coefficients, stored in a matrix that can be accessed by coef(). In this case, it is a $20 \times 100$ matrix, with $20$ rows (one for each predictor, plus an intercept) and $100$ columns (one for each value of $\lambda$).
+Since we have added penalty to the norm of the coefficients, we expect the coefficient estimates to be much smaller, in terms of $\mathcal{l}_2$ norm squared, when a large value of $\lambda$  is used, as compared to when a small value of $\lambda$  is used.\
+\
+Consider first the $50$th choice of $\lambda$, where$\lambda= 11498$.
+
+```{r}
+ridge_mod$lambda[50] #Display 50th lambda value
+coef(ridge_mod)[,50] # Display coefficients associated with 50th lambda value
+sum(coef(ridge_mod)[-1,50]^2) # Calculate l2 norm squared
+```
+
+Then compare the above result with the coefficients for the 60th choice of $\lambda$, where $\lambda=705$
+
+```{r}
+ridge_mod$lambda[60] #Display 60th lambda value
+coef(ridge_mod)[,60] # Display coefficients associated with 60th lambda value
+sum(coef(ridge_mod)[-1,60]^2) # Calculate l2 norm squared
+```
+
+We indeed observe that the $l_2$ norm squared of the coefficients decreases when $\lambda$ value increases.\
+\
+The prediction function is also defined for the glmnet output. For example, the following code calculates the predictions on the whole dataset. The output pred is a $263 \times 100$ matrix, with $263$ rows (one for each observation) and $100$ columns (one for each value of $\lambda$).
+
+```{r}
+pred <- predict(object = ridge_mod, newx = x)
+```
+
+2. Use cv.glmnet (Cross-validation) to Choose the Best Tuning Parameter
+
+Instead of arbitrarily choosing a value of $\lambda$, it would be better to use cross-validation to choose the tuning parameter $\lambda$. We can do this using the built-in cross-validation function, cv.glmnet(). By default, the function performs ten-fold cross-validation, though this can be changed using the argument "folds".
+
+```{r}
+set.seed(1) #we set a random seed first so our results will be reproducible.
+cv.out.ridge=cv.glmnet(x, y, alpha = 0)
+plot(cv.out.ridge)
+abline(v = log(cv.out.ridge$lambda.min), col="red", lwd=3, lty=2)
+bestlam = cv.out.ridge$lambda.min
+bestlam
+out = glmnet(x,y,alpha=0)
+predict(out,type="coefficients",s=bestlam)[1:20,]
+```
+
+This is the best model given from the ridge regression. Notice that none of the coefficients are zero. Ridge regression does not perform variable selection!

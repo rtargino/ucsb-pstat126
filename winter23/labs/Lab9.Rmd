@@ -1,0 +1,114 @@
+---
+title: "PSTAT 126 Lab 9"
+author: ""
+date: "Fall 2022"
+output: pdf_document
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Shrinkage Methods
+
+#### Dataset
+The dataset for analysis is the Major League Baseball Data from the 1986 and 1987 seasons, which consists
+of 322 observations of major league players on 20 variables including the number of hits, number of errors, annual salary etc. Before proceeding, we first import required packages and ensure that the missing values have been removed.
+
+```{r, message=FALSE, warning=FALSE}
+#import required packages
+library(ISLR)
+library(glmnet)
+library(dplyr)
+library(tidyr)
+# ensure that any observation with missing values are removed
+Hitters = na.omit(Hitters)
+```
+We will perform lasso regression in order to predict Salary on the Hitters data. Let’s set up our data first.
+
+```{r}
+x = model.matrix(Salary~., Hitters)[,-1]
+y = Hitters$Salary
+```
+The *model.matrix()* function is particularly useful for creating x from a given data set; not only does it produce a matrix corresponding to the 19 predictors but it also automatically transforms any qualitative variables into dummy variables. The latter property is important because glmnet() can only take numerical, quantitative inputs.
+
+## Lasso Regression
+
+We saw that ridge regression with a wise choice of $\lambda$ can outperform least squares as well as the null model on
+the Hitters data set. We now ask whether the lasso can yield either a more accurate or a more interpretable model than ridge regression. In order to fit a lasso model, we once again use the glmnet() function; however, this time we use the argument $alpha = 1$. Other than that change, we proceed just as we did in fitting a
+ridge model.\
+\
+The lasso has the nice feature that it will set many of the coefficient estimates as exactly 0. This is useful when some of the variables used in a multiple regression model are in fact not associated with the response.
+By removing these variables (by setting the corresponding coefficient estimates to zero), we obtain a model that is more interpretable. This is sometimes referred to as *variable selection*.
+
+```{r}
+grid = 10^seq(10, -2, length = 100)
+lasso.mod <- glmnet(x, y, alpha=1, lambda=grid)
+plot(lasso.mod, xvar="lambda", label = TRUE)
+```
+
+We can see from the coefficient plot that depending on the choice of tuning parameter, some of the coefficients will be exactly equal to zero. We now perform cross-validation and compute the associated test error.
+
+```{r}
+set.seed(1)
+cv.out.lasso = cv.glmnet(x, y, alpha = 1)
+plot(cv.out.lasso)
+abline(v = log(cv.out.lasso$lambda.min), col="red", lwd=3, lty=2)
+bestlam = cv.out.lasso$lambda.min
+```
+
+This is substantially lower than the test set MSE of the null model and of least squares, and very similar to the test MSE of ridge regresion with $\lambda$ chosen by cross-validation.
+
+However, the lasso has a substantial advantage over ridge regression in that the resulting coefficient estimates are sparse. Here we see that some of the 19 coefficient estimates are exactly zero. So the lasso model with $\lambda$ chosen by cross-validation contains only seven variables.
+
+```{r}
+out=glmnet(x,y,alpha=1,lambda=grid)
+lasso.coef=predict(out,type="coefficients",s=bestlam)[1:20,]
+lasso.coef
+```
+
+## Logistic Regression
+
+### Data Set
+
+The 1986 crash of the space shuttle Challenger was linked to failure of O-ring seals in the rocket engines. Data was collected on the 23 previous shuttle missions. The launch temperature on the day of the crash was 31F.
+A data frame with 23 observations on the following 2 variables:
+
+- temp: Temperature at launch in degrees F
+- damage: Number of damage incidents out of 6 possible
+
+First, we plot the proportion of damaged O-rings agains temperature:
+
+```{r, warning=FALSE, message=FALSE}
+library(faraway)
+data(orings)
+plot(damage/6 ~ temp, orings, xlim=c(25,85), ylim=c(0,1), xlab="Temperature", ylab="Prob of damage")
+```
+
+We are interested in how the probability of failure in a given O-ring is related to the launch temperature and predicting that probability when the temperature is 31F.\
+
+For a binomial response data, $y\sim Bin(m,p)$, when $m>1$, we need two pieces of information about the response values, $y$ and $m$. In `R`, one way of doing this is to form a two-column matrix with first column representing the number of "successes" $m$ and the second column the number of "failures" $m-y$. For the *link function*, the `glm` function sets as default the *logit* link function. 
+
+
+```{r, warning=FALSE, message=FALSE}
+logitmod<- glm(cbind(damage, 6-damage)~temp, family=binomial, orings)
+summary(logitmod)
+```
+
+We can plot the logit fit to the data:
+
+```{r, warning=FALSE, message=FALSE}
+plot(damage/6 ~ temp, orings, xlim=c(25,85), ylim=c(0,1), xlab="Temperature", ylab="Prob of damage")
+x<- seq(25, 85, 1)
+lines(x, ilogit(logitmod$coefficients[1]+logitmod$coefficients[2]*x), col="blue")
+```
+
+Now we can predict the response at $31F$:
+
+```{r, warning=FALSE, message=FALSE}
+ilogit(logitmod$coefficients[1]+logitmod$coefficients[2]*31)
+```
+
+We see that the probability of damage at that temperature is really high.
+
+
