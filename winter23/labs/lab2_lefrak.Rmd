@@ -1,0 +1,440 @@
+---
+title: "Computing OLS without lm(), CIs, Plots"
+author: "PSTAT126"
+date: "Lab 2"
+output:
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+
+
+```{r}
+library(tidyverse) # Easily Install and Load the 'Tidyverse'
+library(palmerpenguins) # Palmer Archipelago (Antarctica) Penguin Data
+```
+
+# Going Over Slides 14-16 From Lecture 3
+
+```{r,echo=FALSE}
+set.seed(9)
+Galton <- read.csv("http://cknudson.com/data/Galton.csv")
+len <- length(Galton$Height)
+fit_df <- Galton[sample(1:len, 30),] %>%
+  mutate(Data = "Possible Sample 1")
+fit_df2 <- Galton[sample(1:len, 30),] %>%
+  mutate(Data = "Possible Sample 2")
+fit_df3 <- Galton[sample(1:len, 30),] %>%
+  mutate(Data = "Possible Sample 3")
+total_df <- rbind.data.frame(fit_df, fit_df2, fit_df3)
+```
+
+```{r,echo=FALSE}
+set.seed(8)
+data(eco, package = "faraway")
+fit_df <- lm(log(income) ~ log(1 - usborn), data = eco[sample(1:51, 20),]) %>%
+  broom::augment() %>%
+  select(2:4) %>%
+  rename(y = `log(income)`, x = `log(1 - usborn)`, yhat = .fitted) %>%
+  mutate(ybar = mean(y))
+```
+
+## Variance of Our Estimators $\hat\beta_0, \hat\beta_1$
+In the lecture notes you discussed how for the model 
+
+$$
+y_i = \beta_0 + \beta_1x_i +\epsilon_i, \quad \epsilon_i \stackrel{iid}{\sim} N(0,\sigma^2)
+$$
+
+the variance of the Ordinary Least-Squares (OLS or LS) estimators $\hat\beta_0, \hat\beta_1$ are given by (see Lecture slides)
+$$
+\begin{aligned}
+  \text{Var}(\hat\beta_0) &= 
+      \sigma^2 \left[
+          \frac{1}{n} + \frac{ \bar{x}^2 }{ \sum_{i=1}^n (x_i - \bar{x})^2 }
+      \right]\\
+  \text{Var}(\hat\beta_1) &= 
+      \frac{ \sigma^2 }{ \sum_{i=1}^n (x_i - \bar{x})^2 }
+\end{aligned}
+$$
+
+- But what is even meant by the *variance* of these quantities?
+
+The idea is that if we had all of the possible data, i.e., the *population* data, then (assuming the model is correct) the intercept and slope of the regression line would be given by $\beta_0$ and $\beta_1$ respectively. However, that is almost never the case.
+
+- Our data is almost always a **sample**
+- If the data were to be collected again, the values would almost certainly be different
+- $\hat\beta_0$ and $\hat\beta_1$ are the respective intercept and slope computed from our sample
+
+```{r, fig.width=12, fig.height=8, echo=FALSE, fig.align= "center"}
+ggplot(total_df, aes(x = FatherHeight, y = Height, color = Data)) + 
+  geom_point(size = 3, alpha = 0.7) +
+  labs(x = 'Predictor (x)',
+       y = 'Response (y)') +
+  geom_smooth(method = 'lm', formula = 'y ~ x', se = F) +
+  theme_bw(base_size = 20)+
+  theme(panel.grid = element_blank())
+```
+
+## Computing Estimated $\text{Var}(\hat\beta_0), \text{Var}(\hat\beta_1)$ (Standard Error) in R
+
+We can estimate $\sigma^2$ using the residuals from the fitted linear model:
+
+$$
+\hat\sigma^2 = \frac{1}{n-2} \sum_{i=1}^n (\underbrace{y_i-\hat{y}_i}_{residual})^2
+$$
+
+and plug this in to the variance formulae above. Taking the respective square roots will give us the *Standard Error* of $\hat\beta_0$ and $\hat\beta_1$.
+
+```{r}
+data(gala, package ="faraway")
+fit <- lm(Species ~ Elevation, data=gala) # fit model Species = b0 + b1*Elevation
+# computed with formula
+sigma2.hat <- sum((fit$residuals^2))/fit$df.residual
+sigma2.hat
+# computed using `summary` function
+sigma2.hat <- summary(fit)$sigma^2
+sigma2.hat # gives same result
+sigma.hat <- sqrt(sigma2.hat) # Residual Standard Error
+sigma.hat
+```
+
+```{r}
+y <- gala$Species
+x <- gala$Elevation
+n <- length(y)
+se.beta1 <- sigma.hat/sqrt(sum((x-mean(x))^2))
+se.beta1
+se.beta0 <- sigma.hat*sqrt((1/n+mean(x)^2/sum((x-mean(x))^2)))
+se.beta0
+```
+
+## What is $R^2$? 
+
+### Total Sum of Squares
+
+Suppose you have a response variable $y$ and a predictor variable $x$ in your data set. If you are trying to describe the variation among variables in a data set, there's many ways in which this can be interpreted. For example, we can consider how the values from our $y$ variable vary around the mean $y$ value $\bar{y}$.
+
+$$
+SST = \sum_{i=1}^n(y_i - \bar{y})^2
+$$
+
+```{r, fig.width=8, fig.height=5, echo=FALSE}
+ggplot(fit_df, aes(x = x, y = y)) + 
+  geom_point() +
+  labs(x = 'Predictor (x)',
+       y = 'Response (y)') +
+  #geom_smooth(method = 'lm', formula = 'y ~ x', se = F) +
+  geom_hline(yintercept = mean(fit_df$y),
+             color = "red",
+             linetype = "dashed", size = 1)+
+  geom_linerange(aes(ymin = y, ymax = ybar, x = x), 
+                 inherit.aes = F, alpha = 0.4, color = "black")+
+  # geom_linerange(aes(ymin = yhat, ymax = y, x = x), 
+  #                inherit.aes = F, alpha = 0.4, color = "blue")+
+  # geom_linerange(aes(ymin = yhat, ymax = ybar, x = x), 
+  #                inherit.aes = F, alpha = 0.4, color = "red")+
+  theme_bw(base_size = 20)+
+  theme(panel.grid = element_blank())
+```
+
+But in a linear regression context there are other ways that we can describe variation in our response. In particular, we can notice that $y$ seems to have a linear relationship with $x$, thus the model that
+$$
+y_i = \beta_0 + \beta_1 x_i + \epsilon_i, \quad \epsilon \stackrel{iid}{\sim}N(0,\sigma^2)
+$$
+may be appropriate.
+
+\newpage
+
+## Residual Sum of Squares
+$$
+SSR = \sum_{i=1}^n (y_i - \hat{y}_i)^2
+$$
+
+```{r, fig.width=10, fig.height=6, echo=FALSE}
+ggplot(fit_df, aes(x = x, y = y)) + 
+  geom_point() +
+  labs(x = 'Predictor (x)',
+       y = 'Response (y)') +
+  geom_smooth(method = 'lm', formula = 'y ~ x', se = F) +
+  geom_hline(yintercept = mean(fit_df$y),
+             color = "red",
+             linetype = "dashed", size = 1)+
+  geom_linerange(aes(ymin = yhat, ymax = y, x = x),
+                 inherit.aes = F, alpha = 0.4, color = "blue")+
+  theme_bw(base_size = 20)+
+  theme(panel.grid = element_blank())
+```
+
+The variance left "unexplained" by our model. 
+
+\newpage
+
+## Sum of Squares Regression
+$$
+SS_{reg} = \sum_{i=1}^n (\hat{y}_i - \bar{y})^2
+$$
+
+```{r, fig.width=10, fig.height=6, echo=FALSE}
+ggplot(fit_df, aes(x = x, y = y)) + 
+  geom_point() +
+  labs(x = 'Predictor (x)',
+       y = 'Response (y)') +
+  geom_smooth(method = 'lm', formula = 'y ~ x', se = F) +
+  geom_hline(yintercept = mean(fit_df$y),
+             color = "red",
+             linetype = "dashed", size = 1)+
+  geom_linerange(aes(ymin = yhat, ymax = ybar, x = x),
+                 inherit.aes = F, alpha = 0.4, color = "red")+
+  theme_bw(base_size = 20)+
+  theme(panel.grid = element_blank())
+```
+
+The variance "explained" by our model. Our model partly captures how the values of $y$ vary through the systematic relation that $E[y_i] = \beta_0 + \beta_1 x_i$, but this leaves the variance attributed to noise as "unexplained". Notice that the red lines (SSreg) and the blue lines (SSR) add together to make the black lines (SST), and indeed
+
+$$
+\begin{aligned}
+\underbrace{ SST }_{\text{total}} &= \underbrace{ SS_{reg} }_{\text{explained}} + \underbrace{ SSR }_{\text{unexplained}} \\
+\sum_{i=1}^n(y_i - \bar{y})^2  &= \sum_{i=1}^n (\hat{y}_i - \bar{y})^2 + \sum_{i=1}^n (y_i - \hat{y}_i)^2
+\end{aligned}
+$$
+**Answer: $R^2$ is the proportion of explained variation**
+
+$$
+R^2 = 1 - \frac{SSR}{SST} = \frac{SS_{reg}}{SST}
+$$
+
+# Computing $R^2$ in R
+
+```{r}
+y <- gala$Species
+fit <- lm(Species ~ Elevation, data=gala)
+# computed with formula
+R.2 <- 1 - sum((fit$residuals)^2 )/(sum((y-mean(y))^2))
+R.2
+# computed using `summary` function
+R.2 <- summary(fit)$r.sq
+R.2 # gives same result
+```
+
+
+\newpage
+
+## Computing OLS estimators in simple linear regression (without lm()) : Lecture 1 Slide 39
+
+#### Dataset: Adelie and Gentoo Penguins   
+
+- **Question: Can we predict body mass in grams by a penguins bill length in mm?**
+
+```{r}
+data("penguins")
+
+penguins_noChinstrap <- penguins %>% 
+  filter(species != "Chinstrap") %>% 
+  drop_na(bill_length_mm, body_mass_g)
+
+str(penguins_noChinstrap)
+summary(penguins_noChinstrap)
+
+# plot of data
+
+plot(penguins_noChinstrap$bill_length_mm, penguins_noChinstrap$body_mass_g , 
+     col = "blue", xlab ="", ylab="")
+```
+
+```{r}
+x <- penguins_noChinstrap$bill_length_mm
+y <- penguins_noChinstrap$body_mass_g
+```
+
+\newpage
+
+First obtain means of $x$ and $y$
+```{r}
+x_bar <- mean(x) 
+y_bar <- mean(y)
+```
+
+$$S_{xx} :\Sigma_{i = 1}^n (x_i - \bar{x})^2$$ 
+```{r}
+Sxx <- sum((x - x_bar)^2)
+Sxx
+```
+$$S_{yy} :\Sigma_{i = 1}^n (y_i - \bar{y})^2$$ 
+```{r}
+Syy <- sum((y - y_bar)^2)
+Syy
+```
+
+$$S_{xy} :\Sigma_{i = 1}^n (x_i - \bar{x})(y_i - \bar{y})$$
+```{r}
+Sxy <- sum((x - x_bar)*(y - y_bar))
+Sxy
+```
+
+$$\hat\beta_1 = S_{xy}/S_{xx}$$
+```{r}
+b1 <- Sxy / Sxx
+b1
+```
+
+
+$$\hat\beta_0 = \bar{y} - \hat\beta_1\bar{x}$$
+```{r}
+b0 <- y_bar - b1*x_bar
+b0
+```
+
+$$\hat{Y} = \hat\beta_0 + \hat\beta_1x$$
+```{r}
+y_hat <- b0 + b1*x
+```
+
+**Estimation of Residuals**  
+$$e_i = y_i - \hat{y}$$  
+  
+```{r}
+e <- y - y_hat
+```
+
+$$\hat\sigma^2 = \frac{1}{N-2}\Sigma_{i = 1}^n e_n^2$$
+
+
+```{r}
+n <- length(y)
+sigma_2_hat <- sum(e^2) / (n-2)
+sigma_2_hat
+sqrt(sigma_2_hat) # Residual Standard Error (RSE)
+```
+
+
+\newpage
+## The lm() function
+
+```{r}
+model <- lm(body_mass_g ~ bill_length_mm , data = penguins_noChinstrap)
+```
+
+
+```{r}
+summary(model)
+```
+
+\newpage
+
+```{r}
+coef(model) # Estimates for b0 and b1
+model$coefficients
+```
+
+
+```{r}
+head(residuals(model)) # residuals
+head(fitted(model)) # y_hat values
+
+summary(residuals(model)) # First line in summary output.
+```
+
+
+```{r}
+# Standard errors
+summary(model)$coef[,2]
+coef(summary(model))[, "Std. Error"]
+```
+
+
+
+
+```{r}
+summary(model)$sigma^2
+```
+
+\newpage
+
+## Confidence Intervals for intercept and slope estimates 
+
+Can calculate a 90% confidence interval by entering values into formula:
+
+* **Intercept**
+
+$$\hat\beta_0 \pm (t_{\alpha/2, N-2}\boldsymbol{SE}(\hat\beta_0))$$
+
+* **Slope**
+
+$$\hat\beta_1 \pm (t_{\alpha/2, N-2}\boldsymbol{SE}(\hat\beta_1))$$
+
+```{r}
+n <- length(x)
+sigma_2_hat <- sum(e^2) / (n-2)
+sigma_hat <- sqrt(sigma_2_hat) 
+Sxx <- sum((x - x_bar)^2)
+
+se_b0 <- sqrt(sigma_2_hat*(1/n + 
+                             (x_bar^2)/Sxx)) # se of intercept
+se_b1 <-  sqrt(sigma_2_hat/Sxx) # se of slope
+
+t_pct <- qt(p = 0.95, df = n - 2) # t-statistic
+```
+
+
+```{r}
+CI_b0_90 <-  c(b0 - t_pct*se_b0, b0 + t_pct*se_b0) # 90% CI for b0
+CI_b1_90 <-  c(b1 - t_pct*se_b1, b1 + t_pct*se_b1) # 90% CI for b1
+CI_b0_90
+CI_b1_90
+```
+
+
+Can also use the `confint` function
+```{r}
+#?confint
+confint(model, level = 0.95) # 95% CI
+
+confint(model, level = 0.90) # 90% CI
+
+```
+
+\newpage
+
+
+
+## Plots
+
+
+```{r}
+plot(body_mass_g ~ bill_length_mm , data = penguins_noChinstrap,
+     main = "Plot with fitted values")
+abline(model, col = "Red")
+```
+
+
+
+
+
+
+
+
+## Stat500 Data
+
+```{r}
+library(faraway)
+head(stat500)
+fit <- lm(total ~ final, data=stat500)
+
+plot(stat500$final,stat500$total)
+abline(fit)
+
+par(mfrow=c(2,2))
+plot(fit) #residual graph
+
+
+
+summary(fit)
+
+```
+
+
+
