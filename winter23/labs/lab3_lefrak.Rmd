@@ -1,0 +1,336 @@
+---
+title: "PSTAT 126"
+subtitle: "Lab 3"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    extra_dependencies: ["tikz"]
+---
+<!-- Custom LaTeX Commands -->
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+            \node[shape=circle,draw,inner sep=1pt] (char) {#1};}}
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+```
+
+```{r, include=FALSE}
+# load packages
+library(tidyverse)
+library(patchwork) # allows your to format plots nicely
+library(glue) # allows easy syntax to put variable values in strings
+```
+
+
+## Multiple Linear Regression (MLR)
+
+We can extend the Simple Linear Regression to a Multiple Linear Regression by incorporating more that one predictor:
+$$y_i=\beta_0+\beta_1x_{i1}+ \ldots + \beta_px_{ip} +\epsilon_i, \qquad i=1,\ldots,n$$
+Using matrix notation, the model can be written as:
+$$\mathbf{y}=\mathbf{X}\boldsymbol \beta+\boldsymbol\epsilon, \qquad \boldsymbol \epsilon \sim N_n(\boldsymbol 0,\sigma^2\boldsymbol I_n)$$
+<!-- Stuff Added By Chris -->
+
+### Sidetrack -- Multivariate Normal
+
+The multivariate normal distribution is an intuitive extension of the single variate normal distribution. While we think of the single variate Gaussian as a "bell curve", we can think of a multivariate Gaussian as a "bell surface". If $\textbf{Y} = (Y_1, Y_2, \dots, Y_n)^T$ follows a multivariate normal distribution, then we write 
+$$
+\begin{gathered}
+\textbf{Y} \sim N_n(\boldsymbol{\mu}, \boldsymbol{\Sigma}) \\\\
+\boldsymbol{\mu} = 
+\begin{pmatrix}
+  \mu_1 \\ \mu_2 \\ \vdots \\ \mu_n
+\end{pmatrix}, \quad
+\boldsymbol{\Sigma} = 
+\begin{pmatrix}
+  \text{Cov}(Y_1, Y_1) & \text{Cov}(Y_1, Y_2) & \cdots & \text{Cov}(Y_1, Y_n) \\
+  \text{Cov}(Y_2, Y_1) & \text{Cov}(Y_2, Y_2) & \cdots & \text{Cov}(Y_1, Y_n) \\
+  \vdots & \vdots & \ddots & \vdots \\
+  \text{Cov}(Y_n, Y_1) & \text{Cov}(Y_n, Y_2) & \cdots & \text{Cov}(Y_n, Y_n) \\
+\end{pmatrix}
+\end{gathered}
+$$
+where $\boldsymbol{\mu}$ is the mean (center) of the distribution and $\text{Var}(\textbf{Y}) \stackrel{\Delta}{=} \boldsymbol{\Sigma}$ is the *variance-covariance matrix* ($\stackrel{\Delta}{=}$ is a symbol commonly used to mean "defined as").
+
+#### Example
+
+In the bivariate case, we can create plots to visualize what this distribution looks like. Below are a couple contour plots for a
+$$
+N\left(
+  \begin{pmatrix}
+    0.5 \\ -0.5
+  \end{pmatrix}, 
+  \begin{pmatrix}
+    1 & -0.5 \\ -0.5 & 1
+  \end{pmatrix}
+\right)
+\quad \text{and} \quad
+N\left(
+  \begin{pmatrix}
+    0 \\ 0
+  \end{pmatrix}, 
+  \begin{pmatrix}
+    1.5 & 0 \\ 0 & 0.5
+  \end{pmatrix}
+\right)
+$$
+distribution respectively.
+
+```{r, echo=FALSE, fig.width=8, fig.height = 6, fig.align='center'}
+# defining a function with plot specifications I want
+plot.mtvnorm <- function(mu, Sigma, window = c(-3,3), ratio = 1, resolution = 200){
+  # creates dataframe of x1-x2 coordinate pairs
+  x1x2.grid <- expand.grid(x1 = seq(window[1], window[2], length.out=resolution),
+                         x2 = seq(window[1], window[2], length.out=resolution))
+  
+  # evaluate mtvnormal density function at each coordinate and append to df
+  plot.data <- cbind(x1x2.grid, density = mvtnorm::dmvnorm(x1x2.grid, mean = mu, sigma = Sigma))
+  
+  # plot
+  ggplot(plot.data, aes(x=x1, y=x2, z=density)) + 
+    # create contour plot
+    geom_contour(aes(color = after_stat(level))) + # have color gradient depending on z value
+    # set color pallete to use (I like viridis)
+    colorspace::scale_color_binned_sequential("Viridis") + 
+    # change to black&white theme
+    theme_bw(base_size = 14)+
+    # add axis labels and title
+    labs(
+      x = "x1",
+      y = "x2",
+      # use `glue::glue` function to use syntax similar to a Python f-string
+      title = glue("Mean = ({mu[1]}, {mu[2]})\n Var(x1) = {Sigma[1,1]}, Var(x2) = {Sigma[2,2]}\n Cov(x1, x2) = {Sigma[1,2]}")
+    )+
+    # remove legend
+    theme(legend.position = "none")+
+    # set viewing window and aspect ratio of plot
+    coord_fixed(xlim = window, ylim = window, ratio = ratio)
+}
+mu1 <- c(0.5, -0.5)
+Sigma1 <- matrix(c(1,-0.5,-0.5,1), nrow=2)
+
+mu2 <- c(0, 0)
+Sigma2 <- diag(c(1.5,0.5))
+
+# create the two plots side-by-side, (refer to `patchwork` documentation)
+plot.mtvnorm(mu1, Sigma1) | plot.mtvnorm(mu2, Sigma2)
+```
+
+Question: What would the contour plot of a $N\left((0, 0)^T, \sigma^2 \boldsymbol{I}_2\right)$ distribution look like?
+
+```{r, echo=FALSE, eval=FALSE}
+# Play around with different values of mu and Sigma and see what it looks like!
+# Note you may have to adjust the `window` parameter in the plot.mtvnormal function
+plot.mtvnorm(...)
+```
+
+**Facts About Multivariate Normal RVs**
+
+Let $\boldsymbol{Y}$ be a random $n\times 1$ vector, $A$ be a constant $k\times n$ matrix and $\boldsymbol{c}$ be a constant $k\times 1$ vector, then the following properties hold:
+
+\circled{1} *Linearity of Expectation:*
+$$
+E[A\boldsymbol{Y} + \boldsymbol{c}] = {A}E[\boldsymbol{Y}] + \boldsymbol{c}  
+$$
+
+\circled{2} *Variance of an Affine Transformation:*
+$$
+\text{Var}(A\boldsymbol{Y} + \boldsymbol{c}) = \text{Var}(A\boldsymbol{Y}) = {A}\text{Var}(\boldsymbol{Y}){A}^T 
+$$
+
+\circled{3} *Closure of Normality Under Affine Transformation:*
+
+If $\boldsymbol{Y}$ has a multivariate normal distribution, i.e., $\boldsymbol{Y} \sim N_n(\boldsymbol{\mu}, \boldsymbol{\Sigma})$, then
+
+$$
+A\boldsymbol{Y} + \boldsymbol{c} \sim N_k(A\boldsymbol{\mu} + \boldsymbol{c}, A\boldsymbol{\Sigma}A^T).
+$$
+
+**Note:** These are just generalizations of familiar statistical properties in 1 dimension.
+
+\circled{4} *Marginal Distribution* 
+
+For any $i \in \{1, 2, \dots, n\}$ we have that
+$$
+Y_i \sim N(\mu_i, \Sigma_{ii})
+$$
+where $\Sigma_{ii} = \text{Cov}(Y_i, Y_i) = \text{Var}(Y_i)$ is the $i$th diagonal of $\boldsymbol{\Sigma}$.
+
+\newpage
+
+### MLR Cont.
+
+<!-- End Stuff Added By Chris -->
+
+To get the LS solution of $\boldsymbol \beta$ we minimize the Sum of Squared Residuals:
+
+$$SSR=(\mathbf{y}-\mathbf{X}\boldsymbol \beta)^T(\mathbf{y}-\mathbf{X}\boldsymbol \beta)$$
+We obtain the solution: $\hat{\boldsymbol {\beta}}_{LSE} = {(\boldsymbol X^T\boldsymbol X)^{-1}\boldsymbol X^T \boldsymbol y}$. Additionally, it can be proved that $\hat{\boldsymbol\beta} \sim N_{p^*}(\boldsymbol \beta,{(\boldsymbol X^T\boldsymbol X)^{-1}}\sigma^2 )$.\
+\
+Therefore, it is possible to obtain the Standard Error of $\hat\beta_j$:
+
+$$SE(\hat\beta_j)= \sqrt{\hat\sigma^2\left[X^TX\right]^{-1}_{jj}}$$
+Where $\hat\sigma^2=\frac{(\mathbf{y}-\mathbf{X}\hat{\boldsymbol \beta})^T(\mathbf{y}-\mathbf{X}\hat{\boldsymbol \beta})}{n-p^*}$, with $p^*$ being the number of *parameters* (# of $\beta$'s).
+
+## Data Example
+```{r sum2, echo = TRUE}
+library(faraway)
+data(diabetes)
+model <- lm(weight~chol+ stab.glu+ hdl+height+waist+age, data=diabetes)
+summary(model)
+```
+
+#### Inference
+
+```{r sum3, echo = TRUE}
+summary(model)$coefficients
+```
+
+We get $\hat{\boldsymbol {\beta}}$:
+
+```{r}
+library(faraway)
+betas = summary(model)$coefficients[,1]
+betas
+coef(model) # this returns the same results
+```
+
+We can get $SE(\hat\beta_j) \qquad j=0,\ldots,p$:
+```{r}
+summary(model)$coefficients[,2] 
+```
+
+Coefficient od determination $R^2$:
+```{r}
+summary(model)$r.squared
+```
+
+Residuals:
+```{r}
+Res=residuals(model) 
+```
+
+
+Standard deviation of residuals ($\hat\sigma$):
+```{r}
+sqrt(sum(Res^2) /model$df.residual) # using formula
+sigma(model) # using R built-in function
+```
+
+Confidence and Prediction Intervals:
+```{r}
+# LSE of coefficients with CI
+confint(model, level = .95)
+# 95% CI for the mean response w/ Age=34,chol=186,gluc=85,hdl=46,height=66,waist=46
+new = data.frame(chol=186, stab.glu=85, hdl=46,height=66,waist=46,age=34)
+ans1 = predict(model, new, se.fit = TRUE, interval = "confidence", level = 0.95, type = "response")
+ans1$fit
+# 95% PI for a new observation w/ Age=34,chol=186,gluc=85,hdl=46,height=66,waist=46
+ans2 = predict(model, new, se.fit = TRUE, interval = "prediction", level = 0.95, type = "response")
+ans2$fit
+```
+
+
+
+
+
+## Normal Distribution Review
+
+##### Let $X_1, X_2,...,X_n \stackrel{iid}{\sim} N(\mu, \sigma^2)$. Then the pdf is given for any $\mu\in \mathbb{R},\,x\in \mathbb{R},\,\sigma>0$
+
+Then define the following: $E(X_i)=\mu, Var(X_i)=\sigma^2\,\forall i$
+
+##### The CDF is given by, $F_X(x)=P(X \le x)= 1-P(X > x)$
+For $\mu=0, \sigma=1$, we have the standard normal $Z \sim N(0,1)$:
+
+Some properties are as follows:
+
+1) $P(Z< z)= P(Z> -z)$ 
+2) $P(|Z| > z)= 2P(Z>z)= 2P(Z<-z)$
+3) if $P(Z> z_{\alpha})=\alpha$, then 
+
+$P(z_{1-\alpha/2}< Z < z_{\alpha/2})$
+
+$=P(-z_{\alpha/2}< Z < z_{\alpha/2})=1-\alpha$
+
+##### Computation:
+
+```{r}
+# consider the x-values
+x<- seq(-3.5, 3.5, length.out=100)
+
+# pdf of N(0,1)
+f<- dnorm(x)
+
+f2<- dnorm(x, mean =0, sd = .5) # pdf of N(0,.5)
+f3<- dnorm(x, mean = 1, sd = .75) # pdf of N(1,.75)
+f4<- dnorm(x, mean= -2, sd = 1.5) # pdf of N(-2,1.5)
+
+# plot of pdfs
+plot(x, f, type = "l", lwd=1, col= 1, ylab="Density", ylim=c(0, .95))
+lines(x, f2, type = "l", lwd=1, col= 2)
+lines(x, f3, type = "l", lwd=1, col= 3)
+lines(x, f4, type = "l", lwd=1, col= 4)
+legend(2, .8, legend=c("N(0,1)", "N(0,0.5)","N(1,0.75)","N(-2,1.5)"),
+       col=c(1,2,3,4), lty=1, cex=0.8)
+```
+
+```{r}
+#cdf
+cf1<- pnorm(x) # pdf of N(0,1)
+cf2<- pnorm(x, mean =0, sd = .5) # pdf of N(0,.5)
+cf3<- pnorm(x, mean = 1, sd = .75) # pdf of N(1,.75)
+cf4<- pnorm(x, mean= -2, sd = 1.5) # pdf of N(-2,1.5)
+
+#quantiles 
+q<- seq(0,1, length.out=100)
+qf1<- qnorm(q) # pdf of N(0,1)
+qf2<- qnorm(q, mean =0, sd = .5) # pdf of N(0,.5)
+qf3<- qnorm(q, mean = 1, sd = .75) # pdf of N(1,.75)
+qf4<- qnorm(q, mean= -2, sd = 1.5) # pdf of N(-2,1.5)
+
+par(mfrow= c(1,2))
+# plot of cdfs
+plot(x, cf1, type = "l", lwd=1, col= 1, ylab="CDF", ylim=c(0, 1))
+lines(x, cf2, type = "l", lwd=1, col= 2)
+lines(x, cf3, type = "l", lwd=1, col= 3)
+lines(x, cf4, type = "l", lwd=1, col= 4)
+legend(-3.6, 1.02, legend=c("N(0,1)", "N(0,0.5)","N(1,0.75)","N(-2,1.5)"),
+       col=c(1,2,3,4), lty=1, cex=0.6)
+
+# plot of quantiles
+plot(q, qf1, type = "l", lwd=1, col= 1, ylab="Quantile function", ylim=c(-3,3))
+lines(q, qf2, type = "l", lwd=1, col= 2)
+lines(q, qf3, type = "l", lwd=1, col= 3)
+lines(q, qf4, type = "l", lwd=1, col= 4)
+legend(0, 3, legend=c("N(0,1)", "N(0,0.5)","N(1,0.75)","N(-2,1.5)"),
+       col=c(1,2,3,4), lty=1, cex=0.6)
+
+```
+
+##### Simulation of a linear regression
+
+Consider the x covariate in $[0,1]$ distributed uniformly.
+Then we have the model $$Y_i=1.21+ 2.445X_i + \epsilon_i, i=1,2,...,200$$
+
+```{r}
+# generate x's
+set.seed(54321)
+x<- runif(200)
+
+# generate y's
+y<- 1.21+ 2.445*x+ rnorm(200)
+
+# fit linear model
+fit1<- lm(y~x)
+
+# plot the regression
+plot(x,y, col="red", pch=19)
+abline(fit1)
+
+fit1$coefficients
+
+
+
+
+
+
